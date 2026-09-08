@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<title>Minibagr bazar - Bazos.cz</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="description" content="Bezplatná inzerce na internetu - vyhledávání inzerátů na Bazoš.cz.">
+<meta name="google-play-app" content="app-id=cz.ackee.bazos">
+<meta name="apple-itunes-app" content="app-id=1195042966">
+<meta property="fb:admins" content="1055875657">
+<meta property="og:image" content="https://www.bazos.cz/obrazky/bazoslogoface.png">
+<meta name="ROBOTS" content="NOINDEX">
+<link rel="stylesheet" href="https://www.bazos.cz/bazos67s.css" type="text/css"><link rel="preload" as="image" href="https://www.bazos.cz/obrazky/bazos.svg">
+<link rel="icon" href="https://www.bazos.cz/favicon.svg" type="image/svg+xml">
+<link rel="icon" HREF="https://www.bazos.cz/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="https://www.bazos.cz/apple-touch-icon.png">
+<link rel="search" type="application/opensearchdescription+xml" href="https://www.bazos.cz/search.xml" title="Bazoš.cz">
+<script async="async" src="https://www.google.com/adsense/search/ads.js"></script>
+<script type="text/javascript" charset="utf-8">
+(function(g,o){g[o]=g[o]||function(){(g[o]['q']=g[o]['q']||[]).push(
+  arguments)},g[o]['t']=1*new Date})(window,'_googCsa');
+</script><script>
+var xhr = new XMLHttpRequest();
+var naseptavac_value = '';
+function naseptavac(value) {
+  if (value=='')  {
+  	naseptavac_value = '';
+  	document.getElementById('vysledek').innerHTML='';
+  	}
+else {
+	if (naseptavac_value == value) {
+		return false;
+	}
+	naseptavac_value = value;
+	setTimeout(function () {
+		if (naseptavac_value != value) {
+			return false;
+		}
+		xhr.onreadystatechange = function() {
+ 		 if (this.readyState == 4 && naseptavac_value == value){
+				document.getElementById('vysledek').innerHTML = this.responseText;
+			}
+ 		 };
+		xhr.open("POST", '/suggest.php');
+		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		xhr.send('rubnas=HP&qnas='+encodeURIComponent(naseptavac_value));
+	}, 250);
+}
+}
+
+var naseptavacpsc_value = '';
+function naseptavacpsc(value) {
+  if (value=='')  {
+  	naseptavacpsc_value = '';
+  	document.getElementById('vysledekpsc').innerHTML='<table cellpadding=\"3\" cellspacing=\"0\" class=\"tablenaspsc\"><tr><td class=\"act\" onclick=\"getLocation();\"><b>Inzeráty v okolí</b></td></tr></table>';
+  	}
+else {
+	if (naseptavacpsc_value == value) {
+		return false;
+	}
+	naseptavacpsc_value = value;
+	setTimeout(function () {
+		if (naseptavacpsc_value != value) {
+			return false;
+		}
+		xhr.onreadystatechange = function() {
+ 		 if (this.readyState == 4 && naseptavacpsc_value == value){
+				document.getElementById('vysledekpsc').innerHTML = this.responseText;
+			}
+ 		 };
+		xhr.open("POST", '/suggestpsc.php');
+		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		xhr.send('qnaspsc='+encodeURIComponent(naseptavacpsc_value));
+	}, 250);
+}
+}
+
+function getLocation() {
+if (navigator.geolocation) {navigator.geolocation.getCurrentPosition(showPosition);}
+else {document.getElementById('hlokalita').value = '';}
+}
+function showPosition(position) {
+		xhr.onreadystatechange = function() {
+ 		 if (this.readyState == 4){
+				document.getElementById('hlokalita').value = this.responseText;
+				document.forms['formt'].submit();
+			}
+ 		 };
+		xhr.open("POST", '/zip.php');
+		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		xhr.send('latitude='+encodeURIComponent(position.coords.latitude)+'&longitude='+encodeURIComponent(position.coords.longitude));
+}
+
+var agent_value = '';
+function agentclick() {
+  if (document.getElementById('agentmail').value=='')  {
+  	document.getElementById("agentmail").focus();
+    return false;
+  	}
+else {
+agent_value = document.getElementById('agentmail').value;
+xhr.onreadystatechange = function() {
+  if (this.readyState == 4){
+				document.getElementById('overlay').innerHTML = this.responseText;
+			}
+  };
+xhr.open("POST", '/agent.php');
+xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+xhr.send('hledat=minibagr&rubrikav=&hlokalita=0&humkreis=25&cenaod=&cenado=&cat=&typ=&agentmail='+encodeURIComponent(agent_value));
+}
+}
+
+function odeslatrequest(value,params) {
+xhr.onreadystatechange = function() {
+  if (this.readyState == 4){
+				document.getElementById('overlay').innerHTML = this.responseText;
+			}
+  };
+xhr.open("POST", value);
+xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+xhr.send(params);
+}
+function overlay() {
+	el = document.getElementById("overlay");
+	el.style.display = (el.style.display == "inline") ? "none" : "inline";
+}
+function odeslatakci(postaction,value1,value2,value3) {
+document.getElementById('postaction').value = postaction;
+document.getElementById("postv1").value = value1;
+document.getElementById("postv2").value = value2;
+document.getElementById("postv3").value = value3;
+document.formaction.submit();
+}
+</script>
+</head>
+
+<body>
+
+<div class="sirka">
+
+
+<div class="listalogor">
+<div class="listalogol"><a href="https://www.bazos.cz/" title="Bazos.cz - Inzerce, bazar"><img src="https://www.bazos.cz/obrazky/bazos.svg" width="199" height="34" alt="Bazos.cz - Inzerce, inzeráty"></a></div>
+<div class="listalogom"> <b>... inzerce pro každého</b></div>
+<div class="listalogop"><a href="https://www.bazos.cz/oblibene.php"><b>Oblíbené inzeráty</b></a> <a href="https://www.bazos.cz/moje-inzeraty.php"><b>Moje inzeráty</b></a> <a href="/pridat-inzerat.php"><b><span class=pridati>Přidat inzerát</span></b></a></div>
+</div>
+
+<form name="formt" id="formt" method=get action="/search.php">
+<div class="listah">
+<div class="rubriky">
+<b>
+Co: <span class=vysokoli><span id="vysledek"></span><input type="search" onkeyup="naseptavac(this.value);" id=hledat name=hledat size="17" maxlength="256" value="minibagr" autocomplete="off" title="Co? Vyhledávaný výraz" ></span>
+
+<select name="rubriky" onchange='this.form.submit();' title="Vyber rubriku">
+<option value="www" selected>Všechny rubriky</option>
+<option value="auto">Auto</option>
+<option value="deti">Děti</option>
+<option value="dum">Dům a zahrada</option>
+<option value="elektro">Elektro</option>
+<option value="foto">Foto</option>
+<option value="hudba">Hudba</option>
+<option value="knihy">Knihy</option>
+<option value="mobil">Mobily</option>
+<option value="motorky">Motorky</option>
+<option value="nabytek">Nábytek</option>
+<option value="obleceni">Oblečení</option>
+<option value="pc">PC</option>
+<option value="prace">Práce</option>
+<option value="reality">Reality</option>
+<option value="sluzby">Služby</option>
+<option value="sport">Sport</option>
+<option value="stroje">Stroje</option>
+<option value="vstupenky">Vstupenky</option>
+<option value="zvirata">Zvířata</option>
+<option value="ostatni">Ostatní</option>
+</select>
+
+Lokalita: <span class=vysokolipsc><span id="vysledekpsc"></span><input type="search" name="hlokalita" id="hlokalita" onkeyup="naseptavacpsc(this.value);" onclick="naseptavacpsc(this.value);" value="0" size="4" maxlength="25" autocomplete="off" title="Kde? PSČ (místo)" style="-webkit-appearance: none;"></span>
+Okolí: <input name="humkreis" title="Okolí v km" value="25" size="3" style="width: 25px;"> km
+Cena od: <input name=cenaod title="Cena od Kč" maxlength="12" size="5" value=""> - do: <input name=cenado title="Cena do Kč" maxlength="12" size="5" value=""> Kč <input type="submit" name="Submit" value="Hledat">
+<input type="hidden" name="order" id="order"><input type="hidden" name="kitx" value="ano"></b>
+</div>
+</div>
+</form>
+<div class="drobky"><a href="https://www.bazos.cz/" title="Inzerce Bazoš">Hlavní stránka</a> > <b>Vyhledávání</b> > <h1 class="nadpiskategorie">minibagr</h1></div><br>
+
+
+
+<div class="flexmain"><div class="menuleft"><div class="nadpismenu">Inzerce</div>
+<div class="barvalmenu">
+<div class="barvaleva">
+<div align="center">
+
+<br>
+<a href="https://auto.bazos.cz/"><b>Auto</b></a>
+Inzeráty Celkem: 412695<br>
+Za 24 hodin: 21061<br><br>
+
+<br>
+<a href="https://deti.bazos.cz/"><b>Děti</b></a>
+Inzeráty Celkem: 147877<br>
+Za 24 hodin: 3090<br><br>
+
+<br>
+<a href="https://dum.bazos.cz/"><b>Dům a zahrada</b></a>
+Inzeráty Celkem: 126569<br>
+Za 24 hodin: 3572<br><br>
+
+<br>
+<a href="https://elektro.bazos.cz/"><b>Elektro</b></a>
+Inzeráty Celkem: 69962<br>
+Za 24 hodin: 1886<br><br>
+
+<br>
+<a href="https://foto.bazos.cz/"><b>Foto</b></a>
+Inzeráty Celkem: 12410<br>
+Za 24 hodin: 419<br><br>
+
+<br>
+<a href="https://hudba.bazos.cz/"><b>Hudba</b></a>
+Inzeráty Celkem: 19216<br>
+Za 24 hodin: 543<br><br>
+
+<br>
+<a href="https://knihy.bazos.cz/"><b>Knihy</b></a>
+Inzeráty Celkem: 38406<br>
+Za 24 hodin: 831<br><br>
+
+<br>
+<a href="https://mobil.bazos.cz/"><b>Mobily</b></a>
+Inzeráty Celkem: 17774<br>
+Za 24 hodin: 834<br><br>
+
+<br>
+<a href="https://motorky.bazos.cz/"><b>Motorky</b></a>
+Inzeráty Celkem: 69633<br>
+Za 24 hodin: 2532<br><br>
+
+<br>
+<a href="https://nabytek.bazos.cz/"><b>Nábytek</b></a>
+Inzeráty Celkem: 68949<br>
+Za 24 hodin: 2302<br><br>
+
+<br>
+<a href="https://obleceni.bazos.cz/"><b>Oblečení</b></a>
+Inzeráty Celkem: 91097<br>
+Za 24 hodin: 1741<br><br>
+
+<br>
+<a href="https://pc.bazos.cz/"><b>PC</b></a>
+Inzeráty Celkem: 44075<br>
+Za 24 hodin: 1804<br><br>
+
+<br>
+<a href="https://prace.bazos.cz/"><b>Práce</b></a>
+Inzeráty Celkem: 6556<br>
+Za 24 hodin: 910<br><br>
+
+<br>
+<a href="https://reality.bazos.cz/"><b>Reality</b></a>
+Inzeráty Celkem: 50348<br>
+Za 24 hodin: 2523<br><br>
+
+<br>
+<a href="https://sluzby.bazos.cz/"><b>Služby</b></a>
+Inzeráty Celkem: 6890<br>
+Za 24 hodin: 873<br><br>
+
+<br>
+<a href="https://sport.bazos.cz/"><b>Sport</b></a>
+Inzeráty Celkem: 85653<br>
+Za 24 hodin: 2530<br><br>
+
+<br>
+<a href="https://stroje.bazos.cz/"><b>Stroje</b></a>
+Inzeráty Celkem: 73482<br>
+Za 24 hodin: 3037<br><br>
+
+<br>
+<a href="https://vstupenky.bazos.cz/"><b>Vstupenky</b></a>
+Inzeráty Celkem: 2078<br>
+Za 24 hodin: 130<br><br>
+
+<br>
+<a href="https://zvirata.bazos.cz/"><b>Zvířata</b></a>
+Inzeráty Celkem: 43008<br>
+Za 24 hodin: 2246<br><br>
+
+<br>
+<a href="https://ostatni.bazos.cz/"><b>Ostatní</b></a>
+Inzeráty Celkem: 152730<br>
+Za 24 hodin: 3545<br><br>
+
+
+
+</div>
+</div></div>
+<br><br>
+
+
+
+<br><div class="mobilskryt" style="text-align: center;">
+<a style="font-size: 13px;text-decoration: none;color:#000000;" href="https://www.jasminka.cz/kniha/pavel-vana-lecive-stromy-a-kere-i-.html" target="_blank" rel=”nofollow”><b>Knihkupectví Jasmínka</b><br>
+<span style="font-size: 13px;text-decoration: none;color:#ff6600;">
+<span style="color:#000000;">Pavel Váňa:</span> Léčivé stromy a keře  I. <br><img src="https://www.jasminka.cz/images/v/kerev.jpg" width="100" alt="Knihkupectví Jasmínka" title="Knihkupectví Jasmínka" style="border: 1px solid Black;margin: 4px;">
+<br>
+<img src="https://www.bazos.cz/kosik.svg" alt="Jasminka" height="22" style="border: 0px;"> koupit</span></a></div>
+
+</div><div class="maincontent">
+
+
+<div class="listainzerat inzeratyflex">
+<div class="inzeratynadpis"><img src="https://www.bazos.cz/obrazky/list.gif" width="18" height="16" alt="List inzerátů" class=gallerylista> <form name="formgal" id="formgal" method="post" style="display: inline;"><input type="hidden" name="gal" value="g"><input type="image" alt="Submit" src="https://www.bazos.cz/obrazky/gallery.gif" width="18" height="16" class="gallerylist inputgal"></form> Zobrazeno 1-20 inzerátů z 1 273</div>
+<div class="inzeratycena"><b><span onclick="document.getElementById('order').value=1;document.forms['formt'].submit();" class="paction">Cena</span></b></div>
+<div class="inzeratylok">Lokalita</div>
+<div class="inzeratyview"><span onclick="document.getElementById('order').value=3;document.forms['formt'].submit();" class="paction">Zobrazeno</span></div>
+</div><form name="formaction" method="post" style="display: inline;"><input type="hidden" id="postaction" name="postaction" value=""><input type="hidden" id="postv1" name="postv1" value=""><input type="hidden" id="postv2" name="postv2" value=""><input type="hidden" id="postv3" name="postv3" value=""></form><button type="button" onclick="odeslatrequest('/agent.php','teloverit=');overlay();">Nové inzeráty e-mailem</button>
+	<div id="overlay">
+     <div></div>
+</div>
+
+<div id="container_one"></div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223396379/minibagr-saurus-10n-diesel.php"><img src="https://www.bazos.cz/img/1t/379/223396379.jpg?t=1788523850" class="obrazek" alt="minibagr Saurus 10N diesel" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223396379/minibagr-saurus-10n-diesel.php">minibagr Saurus 10N diesel</a></h2><span class=velikost10> - <span title="TOP 21x Platí do 16.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis><b>minibagr</b> na šírokém podvozku 1100mm
+-Motor Koop 1 válec Euro 5 diesel 7Kw(9,5 HP)
+-Chladič hydrauliky
+-Otoč 360st.
+-Mimoosé kopání
+-Přídavný hydraulický okruh
+-Hloubka výkopu bez rychloupínáku 1650mm
+-Hloubka výkopu s rychloupínákem 1750mm
+-Skutečná hmotnost 952kg
+
+Příplatek za mechanický  ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  115 000 Kč</span></b></div>
+<div class="inzeratylok">Frýdek - Místek<br>739 12</div>
+<div class="inzeratyview">178 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223396379');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223396379');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','3798701','188047','Minibagr');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223396379','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223269095/minibagr-shantui-se12sr.php"><img src="https://www.bazos.cz/img/1t/095/223269095.jpg?t=1788362314" class="obrazek" alt="Minibagr Shantui se12sr" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223269095/minibagr-shantui-se12sr.php">Minibagr Shantui se12sr</a></h2><span class=velikost10> - <span title="TOP 21x Platí do 14.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Stroj ihned k odběru 
+Předváděcí kus 
+Najezd 1,6mth 
+Na stroj 3 roky / 3.000mth záruka 
+Ke stroji zdarma lžíce a rychloupínací zařízení 
+Roztahovací pásy 
+Motor Kubota 
+Hydraulický systém s rozvaděčem NABO a pohony Danfoss poskytuje citlivé, ale silné pohyby při každém manévru. Díky maximální ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  349 900 Kč</span></b></div>
+<div class="inzeratylok">Brno<br>602 00</div>
+<div class="inzeratyview">282 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223269095');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223269095');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','0','9947338','Dorota');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223269095','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223269096/minibagr-gorila-g10s-lite-zanovni.php"><img src="https://www.bazos.cz/img/1t/096/223269096.jpg?t=1788362132" class="obrazek" alt="Minibagr Gorila G10s Lite - zánovní" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223269096/minibagr-gorila-g10s-lite-zanovni.php">Minibagr Gorila G10s Lite - zánovní</a></h2><span class=velikost10> - <span title="TOP 21x Platí do 14.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Prodám <b>minibagr</b> Gorila G10s lite 
+Stav nového stroje 
+Motor COOP 1 válec 
+Najezd 2,1mth 
+V akci příslušenství v hodnotě 40.000,- 
+- svahová lžíce naklápěcí 800mm 
+- ⁠lžíce 400mm 
+- ⁠lžíce 200mm 
+- ⁠rychloupínací zařízení 
+- ⁠hadice cepy 
+- možnost přikoupit vrták, půdní trn, kleště, přidrž ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  149 900 Kč</span></b></div>
+<div class="inzeratylok">Brno<br>602 00</div>
+<div class="inzeratyview">486 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223269096');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223269096');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','0','9947338','Dorota');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223269096','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223269097/pasovy-minibagr-gorila-g20se-pro.php"><img src="https://www.bazos.cz/img/1t/097/223269097.jpg?t=1788361955" class="obrazek" alt="Pásový Minibagr Gorila G20Se pro" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223269097/pasovy-minibagr-gorila-g20se-pro.php">Pásový Minibagr Gorila G20Se pro</a></h2><span class=velikost10> - <span title="TOP 21x Platí do 14.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis><b>minibagr</b> od značky gorila s označením G20Se pro 
+Stroj osazen 3 válcovým motorem Kubota D902 
+Dvourychlostní pohon pasu želva / zajíc 
+Pístové plunzrove čerpadlo lepší průtok hydraulika 
+3 lžíce ke stroji zdarma 
+Rychloupínací zařízení 
+Stroj předváděcí varianta
+Najezd 1.1mth 
+
+Pouze volat  ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  349 900 Kč</span></b></div>
+<div class="inzeratylok">Brno<br>602 00</div>
+<div class="inzeratyview">279 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223269097');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223269097');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','0','9947338','Dorota');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223269097','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223327551/caterpillar-3035-cr-07a-rv-2022-klima.php"><img src="https://www.bazos.cz/img/1t/551/223327551.jpg?t=1788448748" class="obrazek" alt="Caterpillar 303,5 CR 07A - r.v. 2022 - klima" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223327551/caterpillar-3035-cr-07a-rv-2022-klima.php">Caterpillar 303,5 CR 07A - r.v. 2022 - klima</a></h2><span class=velikost10> - <span title="TOP 14x Platí do 7.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Prodám <b>minibagr</b> CAT 303,5 CR 07A, rok výroby 2022, motohodin 3370, hmotnost 3700 Kg, klima, výkon 18, 4 kW, motor CAT C1.7, hloubkový dosah 3, 1m, nulová otoč, hydraulický rychloupínák Verachtert CW 05, 1 x hydraulická svahovací lžíce 120 cm a 1 x podkopová lžíce 50 cm. Nové olejové náplně a filtry. ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  849 000 Kč</span></b></div>
+<div class="inzeratylok">Třebíč<br>674 01</div>
+<div class="inzeratyview">246 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223327551');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223327551');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9383138','7581804','Petr');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223327551','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/222987292/minibagr-1200kg-a12-bagrczech.php"><img src="https://www.bazos.cz/img/1t/292/222987292.jpg?t=1787740523" class="obrazek" alt="Minibagr 1200kg, A12, BAGRCZECH" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/222987292/minibagr-1200kg-a12-bagrczech.php">Minibagr 1200kg, A12, BAGRCZECH</a></h2><span class=velikost10> - <span title="TOP 21x Platí do 7.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>MOTOR: 1 válec, 10.1HP, 7.6kW, 499ccm, diesel KOOP
+PROVOZNÍ HMOTNOST: 1400kg
+UŽITEČNÁ HMOTNOST: 1200kg (1.2t)
+KAPACITA RADLICE: 0.018M3
+ŠÍŘKA DÍKY ROZTAHOVACÍMU PODVOZKU: 934-1150mm
+HLOUBKA KOPÁNÍ: 1620mm (s rychloupínákem 1820mm)
+VÝŠKA STROJE: 2157mm
+ŠÍŘKA PÁSU: 180mm
+KAPACITA PALIVOVÉ NÁDR ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  179 000 Kč</span></b></div>
+<div class="inzeratylok">Ostrava<br>702 00</div>
+<div class="inzeratyview">1171 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','222987292');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','222987292');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','0','4073080','Daniel');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','222987292','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223220561/minirypadlo-minibagr-bagr.php"><img src="https://www.bazos.cz/img/1t/561/223220561.jpg?t=1788532258" class="obrazek" alt="minirypadlo, minibagr, bagr" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223220561/minirypadlo-minibagr-bagr.php">minirypadlo, minibagr, bagr</a></h2><span class=velikost10> - <span title="TOP 15x Platí do 6.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Prodám minirypadlo APS K06,
+Hmotnost 650 kG,
+9 HP , motor Rato Eu5, benzín,
+Rok výroby 2026,
+V ceně zahrnuto již mimoosé kopání, lopata 30 cm, hydraulické vývody na přídavné zařízení, oka pro přidržovač kulatiny, odnímatelná stříška,skřínka s nářadím, toto vše máte za zaváděcí cenu 89.900,-Kč+DP ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  89 900 Kč</span></b></div>
+<div class="inzeratylok">Pardubice<br>530 02</div>
+<div class="inzeratyview">609 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223220561');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223220561');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9163231','5361997','Ps+sprint+s.r.o.');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223220561','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223395131/minibagr-takeuchi-tb-225-rok-2019-hyd-upinak-3-lzice.php"><img src="https://www.bazos.cz/img/1t/131/223395131.jpg?t=1788521671" class="obrazek" alt="Minibagr Takeuchi TB 225 rok 2019 hyd. upínak 3 lžíce" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223395131/minibagr-takeuchi-tb-225-rok-2019-hyd-upinak-3-lzice.php">Minibagr Takeuchi TB 225 rok 2019 hyd. upínak 3 lžíce</a></h2><span class=velikost10> - <span title="TOP 10x Platí do 5.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Prodám špičkový Japonský
+<b>minibagr</b> minirypadla pásový bagr
+Takeuchi TB 225
+Rok 2019
+Poučte mth 3850
+Váha 2500 kg
+Rychlosti Želva Zajíc
+Topení
+Odpružena sedačka
+Originál rádio
+Led osvětlení
+Automaticky plyn
+4x přídavný okruh na pomocnou hydrauliku ovládaný na jostiku
+Mimoose kopání
+Hydra ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  485 000 Kč</span></b></div>
+<div class="inzeratylok">Pardubice<br>533 03</div>
+<div class="inzeratyview">206 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223395131');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223395131');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','0','7584293','tb');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223395131','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/222339419/minibagr-kmz-38.php"><img src="https://www.bazos.cz/img/1t/419/222339419.jpg?t=1788421532" class="obrazek" alt="minibagr KMZ 38" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/222339419/minibagr-kmz-38.php">minibagr KMZ 38</a></h2><span class=velikost10> - <span title="TOP 10x Platí do 4.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Kompletní hydraulický pilot
+Hydraulické pilotní ovládání může přesně řídit tlak, průtok a směr kapaliny, aby bylo dosaženo vysoce přesného ovládání.KMZ38kombinuje vynikající sílu, všestrannost a výkon a poskytuje jedno z nejkomplexnějších rýpadel na trhu. Díky špičkové technologii produkuje méně hl ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  648 000 Kč</span></b></div>
+<div class="inzeratylok">Strakonice<br>388 01</div>
+<div class="inzeratyview">297 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','222339419');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','222339419');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','5370856','7601086','Adam');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','222339419','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223272034/prislusenstvi-k-minibagrum.php"><img src="https://www.bazos.cz/img/1t/034/223272034.jpg?t=1788370935" class="obrazek" alt="Příslušenství k minibagrům a bagrům" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223272034/prislusenstvi-k-minibagrum.php">Příslušenství k minibagrům a bagrům</a></h2><span class=velikost10> - <span title="TOP 10x Platí do 3.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Bagry od 1t do 2t
+Průměr čepu 25
+Mezi ušima 90
+Rozteč čepu 85
+
+- Lopata s hydraulickým palcem 21900Kč
+- Hydraulické kladivo 35900Kč
+- Dráp 3290Kč
+- Hrábě 3900Kč
+- Lžíce 80 cm 6900Kč
+- Úzká lžíce 3900Kč
+- Kleště na dřevo 6900Kč
+- Hydraulická mušlová lopata 15900Kč
+- Prosévací lžíce 6900K ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">V textu</span></b></div>
+<div class="inzeratylok">Ostrava<br>702 00</div>
+<div class="inzeratyview">239 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223272034');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223272034');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9507466','4073080','Daniel');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223272034','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223392906/bagr-k12.php"><img src="https://www.bazos.cz/img/1t/906/223392906.jpg?t=1788529533" class="obrazek" alt="bagr ,K12," width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223392906/bagr-k12.php">bagr ,K12,</a></h2><span class=velikost10> - <span title="TOP 8x Platí do 3.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>
+<b>minibagr</b> 1200kg, 
+MOTOR: 1 válec, 10.1HP, diesel KOOP
+ HMOTNOST: 1200kg (1.2t)
+HLOUBKA KOPÁNÍ: 1620mm
+ (s rychloupínákem 1820mm)
+VÝŠKA STROJE: 2157mm
+ŠÍŘKA PÁSU: 180mm
+
+V ceně :
+Mimoosé kopání, 360 nekonečná otoč,  skryté hadice v rameni,  ovládaní joysticky na boku,  chladič hydr. oleje, ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  139 000 Kč</span></b></div>
+<div class="inzeratylok">Pardubice<br>530 02</div>
+<div class="inzeratyview">60 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223392906');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223392906');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9163231','5361997','PS+sprint+s.r.o.');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223392906','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223348249/minibagr-kme-06.php"><img src="https://www.bazos.cz/img/1t/249/223348249.jpg?t=1788423013" class="obrazek" alt="minibagr KME 06" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223348249/minibagr-kme-06.php">minibagr KME 06</a></h2><span class=velikost10> - <span title="TOP 9x Platí do 3.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Rypadlo KME06 je náš nejekoničtější model, navržený pro maximální kompaktnost a bezkonkurenční všestrannost. Jeho poloviční otočná záď a otočný výložník ho předurčují pro bezpečnou práci kolem překážek a minimalizují riziko poškození. Snadno přístupná kapota motoru a dobře umístěné body údržby zjedn ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  99 000 Kč</span></b></div>
+<div class="inzeratylok">Písek<br>398 11</div>
+<div class="inzeratyview">213 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223348249');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223348249');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','5370856','7601086','Adam');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223348249','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223310235/zemni-vrtak-hydraulicky.php"><img src="https://www.bazos.cz/img/1t/235/223310235.jpg?t=1788339494" class="obrazek" alt="Zemní vrták hydraulický" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223310235/zemni-vrtak-hydraulicky.php">Zemní vrták hydraulický</a></h2><span class=velikost10> - <span title="TOP 9x Platí do 2.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>Dobrý den, prodám nový půdní hydraulický vrták pro <b>minibagr</b>y 800-2000kg,robustní, výkonný,vrták se skládá ze 3 kusů(hydromotor,šroubovice,držák a hadice)
+Průměr šroubovice 150mm, 200mm, 250mm, 300mm
+Délka šroubovice 810mm
+Celková délka 1400mm
+
+Cena včetně jedné šroubovice 200mm
+Cena bez DPH
+ ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  12 900 Kč</span></b></div>
+<div class="inzeratylok">Frýdek - Místek<br>739 12</div>
+<div class="inzeratyview">343 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223310235');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223310235');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','6752342','76045','Pudnivrtak');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223310235','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223220433/minirypadlo-minibagr-bagr.php"><img src="https://www.bazos.cz/img/1t/433/223220433.jpg?t=1788517333" class="obrazek" alt="minirypadlo, minibagr, bagr" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223220433/minirypadlo-minibagr-bagr.php">minirypadlo, minibagr, bagr</a></h2><span class=velikost10> - <span title="TOP 10x Platí do 1.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>nabízíme minirypadlo, <b>minibagr</b>, Osvědčený model, APS- KME 10 , Ihned k odběru,Akce v ceně jsou lopaty 20+40+80cm
+- v ceně stroje dále dostanete:
+- vývody na přídavné příslušenství,
+- chlazení hydrauliky - zabraňuje přehřívání hydraulického oleje ( u levnějších bagrů toto nenajdete)!
+- masivní na ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  125 900 Kč</span></b></div>
+<div class="inzeratylok">Pardubice<br>530 02</div>
+<div class="inzeratyview">604 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223220433');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223220433');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9163231','5361997','Ps+sprint+s.r.o.');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223220433','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223260565/bagr-minibagrrypadlo-motor-kubota.php"><img src="https://www.bazos.cz/img/1t/565/223260565.jpg?t=1788528622" class="obrazek" alt="bagr, minibagr,rypadlo,  motor Kubota" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223260565/bagr-minibagrrypadlo-motor-kubota.php">bagr, minibagr,rypadlo,  motor Kubota</a></h2><span class=velikost10> - <span title="TOP 9x Platí do 1.10. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>bagr, pásové rýpadlo, <b>minibagr</b>, motor Kubota, 4100 kg
+Prodáme rypadlo AR 360, motor Kubota D1703, 3 válce, s kabinou.
+Profesionální masivní zpracování, bohatá výbava stroje.
+základní cena 649.000,- Kč
+
+Provozní hmotnost 3800 kg + závaží na 4100 kg , mimoosé kopání, klimatizace v ceně , hydrauli ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">V textu</span></b></div>
+<div class="inzeratylok">Pardubice<br>530 02</div>
+<div class="inzeratyview">330 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223260565');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223260565');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9163231','5361997','Ps+sprint+s.r.o.');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223260565','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223263769/bagr-minirypadlo-motor-yanmar.php"><img src="https://www.bazos.cz/img/1t/769/223263769.jpg?t=1788412260" class="obrazek" alt="bagr, minirypadlo - motor yanmar" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223263769/bagr-minirypadlo-motor-yanmar.php">bagr, minirypadlo - motor yanmar</a></h2><span class=velikost10> - <span title="TOP 6x Platí do 28.9. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>minirypadlo, <b>minibagr</b>, bagr , yanmar motor
+<b>minibagr</b>, minirypadlo, nový stroj APS KME 12, Jedná se o jeden z mnoha modelů bagrů v naší široké nabídce. S hmotností 1200 kg a motorem Yanmar 3 válec, je tento bagr připraven na těžkou práci. Díky své schopnosti mimoosého kopání zvládne různé úkoly.
+
+- ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  129 900 Kč</span></b></div>
+<div class="inzeratylok">Pardubice<br>530 02</div>
+<div class="inzeratyview">250 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223263769');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223263769');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9163231','5361997','Ps+sprint+s.r.o.');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223263769','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/222466063/minibagr-saurus-diesel-kubota.php"><img src="https://www.bazos.cz/img/1t/063/222466063.jpg?t=1788510062" class="obrazek" alt="Minibagr Saurus 14 , diesel Kubota" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/222466063/minibagr-saurus-diesel-kubota.php">Minibagr Saurus 14 , diesel Kubota</a></h2><span class=velikost10> - <span title="TOP 21x Platí do 28.9. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>-Šířka podvozku 110mm
+-Motor - KUBOTA 3-válec D722 10,2kW
+-joysticky (pro komfortnější obsluhu)
+-mimoosé kopání
+-hlavní pístnice ze zadní strany ramene
+-hydraulické hadice uvnitř ramene
+-přídavný okruh
+-hloubkový dosah 1770mm
+-zámek hydrauliky
+-osvětlení LED
+
+
+Cena bez DPH.</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  209 000 Kč</span></b></div>
+<div class="inzeratylok">Frýdek - Místek<br>739 12</div>
+<div class="inzeratyview">983 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','222466063');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','222466063');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9167768','7235026','David');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','222466063','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/223240478/bagr-minibagr.php"><img src="https://www.bazos.cz/img/1t/478/223240478.jpg?t=1788528603" class="obrazek" alt="bagr, minibagr," width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/223240478/bagr-minibagr.php">bagr, minibagr,</a></h2><span class=velikost10> - <span title="TOP 6x Platí do 28.9. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis>nabízíme minirypadlo, <b>minibagr</b>, Osvědčený model, APS- KME 10 , Ihned k odběru, lopaty 20+40+80 cm již v ceně,
+- v ceně stroje dále dostanete:
+- vývody na přídavné příslušenství,
+- chlazení hydrauliky - zabraňuje přehřívání hydraulického oleje ( u levnějších bagrů toto nenajdete)!
+- masivní napín ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  129 900 Kč</span></b></div>
+<div class="inzeratylok">Praha 10<br>100 00</div>
+<div class="inzeratyview">172 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','223240478');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','223240478');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9163231','5361997','Ps+sprint+s.r.o.');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','223240478','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/222472986/minibagr-saurus-10-n.php"><img src="https://www.bazos.cz/img/1t/986/222472986.jpg?t=1788509886" class="obrazek" alt="MINIBAGR SAURUS 10-N" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/222472986/minibagr-saurus-10-n.php">MINIBAGR SAURUS 10-N</a></h2><span class=velikost10> - <span title="TOP 21x Platí do 28.9. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis><b>minibagr</b> na šírokém podvozku 1100mm
+-Motor Koop 1 válec Euro 5 diesel 7Kw(9,5 HP)  
+-Chladič hydrauliky
+-Otoč 360st.
+-Mimoosé kopání
+-Přídavný hydraulický okruh
+-Hloubka výkopu bez rychloupínáku 1650mm
+-Hloubka výkopu s rychloupínákem 1750mm
+-Skutečná hmotnost 952kg
+
+Příplatek za mechanick ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  115 000 Kč</span></b></div>
+<div class="inzeratylok">Frýdek - Místek<br>739 12</div>
+<div class="inzeratyview">986 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','222472986');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','222472986');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9167768','7235026','David');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','222472986','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+
+<div class="inzeraty inzeratyflex">
+<div class="inzeratynadpis"><a href="https://stroje.bazos.cz/inzerat/222473742/minibagr-saurus-11-n.php"><img src="https://www.bazos.cz/img/1t/742/222473742.jpg?t=1787550856" class="obrazek" alt="MINIBAGR SAURUS 11-N" width="170" height="128"></a>
+<h2 class=nadpis><a href="https://stroje.bazos.cz/inzerat/222473742/minibagr-saurus-11-n.php">MINIBAGR SAURUS 11-N</a></h2><span class=velikost10> - <span title="TOP 21x Platí do 28.9. 2026" class="ztop">TOP</span> - [5.9. 2026]</span><br>
+<div class=popis><b>minibagr</b> na šírokém podvozku 1100mm
+-Motor Koop 1 válec Euro 5 diesel 7Kw(9,5 HP)
+-Ovládání joysticky po stranách
+-Chladič hydrauliky
+-Otoč 360st.
+-Mimoosé kopání
+-Přídavný hydraulický okruh
+-Hloubka výkopu bez rychloupínáku 1680mm
+-Hloubka výkopu s rychloupínákem 1800mm
+-Skutečná hmotnost  ...</div><br><br>
+</div>
+<div class="inzeratycena"><b><span translate="no">  129 000 Kč</span></b></div>
+<div class="inzeratylok">Frýdek - Místek<br>739 12</div>
+<div class="inzeratyview">1452 x</div>
+<div class="inzeratyakce">
+<span onclick="odeslatakci('spam','222473742');return false;" class="akce paction">Označit špatný inzerát</span> <span onclick="odeslatakci('category','222473742');return false;" class="akce paction">Chybnou kategorii</span> <span onclick="odeslatakci('rating','9167768','7235026','David');return false;" class="akce paction">Ohodnotit uživatele</span> <span onclick="odeslatakci('edit','222473742','stroje');return false;" class="akce paction">Smazat/Upravit/Topovat</span>
+</div>
+</div>
+<div id="container_two"></div><br>
+<br><div class="strankovani">Stránka: <b><span class=cisla>1</span></b> <a href="search.php?hledat=minibagr&hlokalita=0&humkreis=25&cenaod=&cenado=&order=&crz=20" rel="nofollow">2</a> <a href="search.php?hledat=minibagr&hlokalita=0&humkreis=25&cenaod=&cenado=&order=&crz=40" rel="nofollow">3</a> <a href="search.php?hledat=minibagr&hlokalita=0&humkreis=25&cenaod=&cenado=&order=&crz=60" rel="nofollow">4</a> <a href="search.php?hledat=minibagr&hlokalita=0&humkreis=25&cenaod=&cenado=&order=&crz=80" rel="nofollow">5</a> <a href="search.php?hledat=minibagr&hlokalita=0&humkreis=25&cenaod=&cenado=&order=&crz=100" rel="nofollow">6</a> <a href="search.php?hledat=minibagr&hlokalita=0&humkreis=25&cenaod=&cenado=&order=&crz=120" rel="nofollow">7</a> <a href="search.php?hledat=minibagr&hlokalita=0&humkreis=25&cenaod=&cenado=&order=&crz=140" rel="nofollow">8</a> <a href="search.php?hledat=minibagr&hlokalita=0&humkreis=25&cenaod=&cenado=&order=&crz=20" rel="nofollow"><b>Další</b></a></div><br><br><br>
+
+
+</div></div><script type="text/javascript" charset="utf-8">
+var pageOptions = {
+  'pubId': 'pub-3645948300403337',
+  'query' : "minibagr",
+  'channel': '4719857758',
+  'linkTarget' : '_blank',
+  'personalizedAds' : 'false',
+  'ivt': false,
+  'styleId' : '6171314811',  'hl': 'cs'
+};
+
+
+var adblock1 = {
+  'container': 'container_one',
+  'width': 'auto',
+  'maxTop' : 2
+};
+
+var adblock2 = {
+  'container': 'container_two',
+  'width': 'auto',
+  'number' : 2
+};
+
+_googCsa('ads', pageOptions, adblock2);</script>
+<br>
+
+&copy;2026 Bazoš -  <b>Inzerce, Bazar</b><br>
+<a href="https://www.bazos.cz/napoveda.php">Nápověda</a>, <a href="https://www.bazos.cz/dotazy.php">Dotazy</a>, <a href="https://www.bazos.cz/hodnoceni.php">Hodnocení</a>, <a href="https://www.bazos.cz/kontakt.php">Kontakt</a>, <a href="https://www.bazos.cz/reklama.php">Reklama</a>, <a href="https://www.bazos.cz/podminky.php">Podmínky</a>, <a href="https://www.bazos.cz/ochrana-udaju.php">Ochrana údajů</a>, <a href="https://www.bazos.cz/rss.php?hlokalita=0&humkreis=25&hledat=minibagr">RSS</a>, <form name="formvkm" id="formvkm" method="post" style="display: inline;"><input type="hidden" name="vkm" value="m"><input type="submit" class="vkm" value="Mobilní verze"></form><br>
+Inzeráty celkem:<b>
+1539408</b>, inzerce za 24 hodin: <b>56409</b><br><br>
+<a href="https://www.bazos.cz/mapa-kategorie.php">Mapa kategorií</a>, <a href="https://www.bazos.cz/mapa-search.php">Nejvyhledávanější výrazy</a>, Tmavý motiv: <form name="formdark" action="https://www.bazos.cz" method="post" style="display: inline;"><input type="hidden" name="darkmode" value="1"><input type="submit" class="vkm" value="Vypnuto"></form><br>
+Země: <a href="https://www.bazos.cz">Česká republika</a>, <a href="https://www.bazos.sk">Slovensko</a>, <a href="https://www.bazos.pl">Polsko</a>, <a href="https://www.bazos.at">Rakousko</a>
+<br>
+<br>
+</div>
+
+<script src="https://www.bazos.cz/cookie-consent.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({"notice_banner_type":"simple","consent_type":"express","palette":"light","language":"cs","page_load_consent_levels":["strictly-necessary"],"notice_banner_reject_button_hide":false,"preferences_center_close_button_hide":false,"page_refresh_confirmation_buttons":false,"cookie_domain": "bazos.cz"});
+});
+</script>
+<a href="#" id="open_preferences_center"> </a>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NZW1QTHKBB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('consent', 'default', {
+  'ad_storage': 'denied',
+  'ad_user_data': 'denied',
+  'ad_personalization': 'denied',
+});
+
+  gtag('config', 'G-NZW1QTHKBB');
+</script>
+</body>
+</html>

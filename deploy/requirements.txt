@@ -1,0 +1,13 @@
+# Závislosti Multi-Portal Scraperu
+# DevOps Agent | Pinované verze pro reprodukovatelné Docker buildy
+
+beautifulsoup4==4.12.3
+requests==2.32.3
+# curl_cffi — TLS impersonace Chrome pro Kleinanzeigen (obejití anti-bot ochrany)
+curl-cffi==0.7.3
+# lxml jako rychlý HTML parser (fallback: html.parser)
+lxml==5.2.2
+# Dashboard a analytika (Fáze 3)
+streamlit==1.36.0
+pandas==2.2.2
+plotly==5.22.0

@@ -1,0 +1,68 @@
+﻿# docker-compose.yml — garmin Scraper
+# DevOps Agent | Produkční konfigurace s persistentním datovým volumem
+
+version: "3.9"
+
+services:
+  garmin-scraper:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: garmin-scraper
+    restart: unless-stopped
+
+    # --- SECRETS: Zkopíruj .env.example -> .env a vyplň ---
+    env_file:
+      - .env
+
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SCRAPE_INTERVAL_MIN: ${SCRAPE_INTERVAL_MIN:-120}
+      SCRAPE_INTERVAL_MAX: ${SCRAPE_INTERVAL_MAX:-300}
+      SEEN_IDS_PATH: /data/seen_ids.json
+      DB_PATH: /data/market.db
+
+    volumes:
+      # Persistentní uložiště seen_ids.json
+      - garmin_data:/data
+
+    # Limit zdrojů (volitelné)
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  garmin-dashboard:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: garmin-dashboard
+    restart: unless-stopped
+    command: streamlit run /app/dashboard/app.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      DB_PATH: /data/market.db
+    volumes:
+      - garmin_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  garmin_data:
+    driver: local

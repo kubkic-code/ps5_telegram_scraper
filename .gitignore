@@ -1,0 +1,83 @@
+# =============================================================================
+# .gitignore — Garmin Watch Scraper & Arbitrage Dashboard (Bazoš.cz & Vinted.cz)
+# =============================================================================
+
+# --- Secrets & Environment Variables (CRITICAL) ---
+.env
+.env.local
+.env.*.local
+deploy/.env
+*.env
+!.env.example
+!deploy/.env.example
+
+# --- Database & Storage (CRITICAL) ---
+*.db
+*.sqlite
+*.sqlite3
+data/
+market.db
+scraper/market.db
+dashboard/market.db
+
+# --- Runtime State & Caches ---
+seen_ids.json
+scraper/seen_ids.json
+
+# --- Python & Bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Virtual Environments ---
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Testing & Code Quality ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Logs & Docker ---
+*.log
+logs/
+docker-compose.override.yml
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Test Fixtures (DO NOT IGNORE — needed for reproducible pytest tests) ---
+# scraper/fixtures/
