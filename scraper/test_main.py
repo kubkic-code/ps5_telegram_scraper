@@ -20,24 +20,24 @@ import main as main_module
 # Pomocne tovarny
 # ---------------------------------------------------------------------------
 
-def make_bazos_inzerat(id: str = "100", nazev: str = "Garmin Fenix 7 Sapphire") -> Inzerat:
+def make_bazos_inzerat(id: str = "100", nazev: str = "PlayStation 5 Disk Edition") -> Inzerat:
     return Inzerat(
         id=id,
         nazev=nazev,
-        url=f"https://www.bazos.cz/inzerat/{id}/garmin-fenix.php",
-        cena="8 500 Kč",
+        url=f"https://pc.bazos.cz/inzerat/{id}/playstation-5.php",
+        cena="9 500 Kč",
         lokalita="Praha",
         datum="5.9. 2026",
-        popis="Garmin Fenix 7 Sapphire Solar, zánovní stav.",
+        popis="PlayStation 5 s mechanikou, kompletní balení, zánovní stav.",
     )
 
 
-def make_vinted_inzerat(id: str = "vt_4567890001") -> Inzerat:
+def make_vinted_inzerat(id: str = "vt_4567890001", nazev: str = "PS5 Slim Digital") -> Inzerat:
     return Inzerat(
         id=id,
-        nazev="Garmin Forerunner 945 Black",
-        url=f"https://www.vinted.cz/items/{id[3:]}-garmin-forerunner",
-        cena="5 200 Kč",
+        nazev=nazev,
+        url=f"https://www.vinted.cz/items/{id[3:]}-ps5-slim",
+        cena="8 200 Kč",
         lokalita="Brno",
         datum="VT",
         popis="Perfektní stav, kompletní balení.",
@@ -66,40 +66,47 @@ class TestJedenCyklus(unittest.TestCase):
         self.seen_path = pathlib.Path(self.tmp.name)
         self.seen_path.unlink()
 
+        self.db_tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        self.db_tmp.close()
+        self.db_path = pathlib.Path(self.db_tmp.name)
+        from db import init_db
+        init_db(self.db_path)
+
     def tearDown(self):
         self.seen_path.unlink(missing_ok=True)
+        self.db_path.unlink(missing_ok=True)
 
     def _bazos_html(self) -> str:
         fixture = pathlib.Path(__file__).parent / "fixtures" / "bazos_search.html"
         return fixture.read_text(encoding="utf-8", errors="replace")
 
-    def _bazos_garmin_inzeraty(self) -> list[Inzerat]:
-        """Vrací Garmin inzeráty pro Bazůš (fixture má bagry — mockujeme)."""
+    def _bazos_ps5_inzeraty(self) -> list[Inzerat]:
+        """Vrací PS5 inzeráty pro Bazoš."""
         return [
             Inzerat(
                 id="223396379",
-                nazev="Garmin Fenix 7 Sapphire Solar",
-                url="https://www.bazos.cz/inzerat/223396379/garmin-fenix-7.php",
-                cena="8 500 Kč",
+                nazev="PlayStation 5 Slim 1TB Disk",
+                url="https://pc.bazos.cz/inzerat/223396379/ps5-slim.php",
+                cena="9 500 Kč",
                 lokalita="Praha",
                 datum="5.9. 2026",
-                popis="Zánovní Garmin Fenix 7.",
+                popis="Zánovní PlayStation 5 Slim s mechanikou.",
             ),
             Inzerat(
                 id="223396380",
-                nazev="Garmin Forerunner 945",
-                url="https://www.bazos.cz/inzerat/223396380/garmin-fr945.php",
-                cena="5 200 Kč",
+                nazev="Sony PlayStation 5 Digital Edition",
+                url="https://pc.bazos.cz/inzerat/223396380/ps5-digital.php",
+                cena="8 200 Kč",
                 lokalita="Brno",
                 datum="5.9. 2026",
-                popis="Garmin Forerunner 945, kompletní balení.",
+                popis="PlayStation 5 Digital, kompletní balení.",
             ),
         ]
 
     def _vinted_inzeraty(self) -> list[Inzerat]:
         """Načte Vinted inzeráty z lokální fixture — žádný HTTP."""
         from vinted_scraper import parsuj_html_vinted
-        fixture = pathlib.Path(__file__).parent / "fixtures" / "vinted_garmin.html"
+        fixture = pathlib.Path(__file__).parent / "fixtures" / "vinted_ps5.html"
         html = fixture.read_text(encoding="utf-8", errors="replace")
         return parsuj_html_vinted(html)
 
@@ -108,7 +115,7 @@ class TestJedenCyklus(unittest.TestCase):
         notifier = make_notifier_mock()
         session = MagicMock()
         vinted_session = make_vinted_session()
-        bazos_inzeraty = self._bazos_garmin_inzeraty()
+        bazos_inzeraty = self._bazos_ps5_inzeraty()
         vinted_inzeraty = self._vinted_inzeraty()
 
         with patch("main.stahni_stranku", return_value=""):
@@ -120,6 +127,7 @@ class TestJedenCyklus(unittest.TestCase):
                         notifier=notifier,
                         seen_ids_cesta=self.seen_path,
                         vinted_enabled=True,
+                        db_path=self.db_path,
                     )
 
         # V seen_ids musi byt ID z obou portalu
@@ -142,6 +150,7 @@ class TestJedenCyklus(unittest.TestCase):
                     notifier=notifier,
                     seen_ids_cesta=self.seen_path,
                     vinted_enabled=False,
+                    db_path=self.db_path,
                 )
                 mock_vinted.assert_not_called()
 
@@ -149,7 +158,7 @@ class TestJedenCyklus(unittest.TestCase):
         notifier = make_notifier_mock()
         session = MagicMock()
         vinted_session = make_vinted_session()
-        bazos_inzeraty = self._bazos_garmin_inzeraty()
+        bazos_inzeraty = self._bazos_ps5_inzeraty()
 
         with patch("main.stahni_stranku", return_value=""):
             with patch("main.parsuj_html", return_value=bazos_inzeraty):
@@ -158,6 +167,7 @@ class TestJedenCyklus(unittest.TestCase):
                         session=session, vinted_session=vinted_session,
                         notifier=notifier, seen_ids_cesta=self.seen_path,
                         vinted_enabled=True,
+                        db_path=self.db_path,
                     )
         self.assertGreater(len(seen), 0)
 
@@ -174,6 +184,7 @@ class TestJedenCyklus(unittest.TestCase):
                     session=session, vinted_session=vinted_session,
                     notifier=notifier, seen_ids_cesta=self.seen_path,
                     vinted_enabled=True,
+                    db_path=self.db_path,
                 )
         # Vinted inzeraty musi byt v seen_ids i kdyz Bazos padl
         vinted_ids = {i for i in seen if i.startswith("vt_")}
@@ -184,7 +195,7 @@ class TestJedenCyklus(unittest.TestCase):
         notifier = make_notifier_mock()
         session = MagicMock()
         vinted_session = make_vinted_session()
-        bazos_inzeraty = self._bazos_garmin_inzeraty()
+        bazos_inzeraty = self._bazos_ps5_inzeraty()
 
         with patch("main.stahni_stranku", return_value=""):
             with patch("main.parsuj_html", return_value=bazos_inzeraty):
@@ -193,6 +204,7 @@ class TestJedenCyklus(unittest.TestCase):
                         session=session, vinted_session=vinted_session,
                         notifier=notifier, seen_ids_cesta=self.seen_path,
                         vinted_enabled=True,
+                        db_path=self.db_path,
                     )
         bazos_ids = {i for i in seen if not i.startswith("vt_")}
         self.assertGreater(len(bazos_ids), 0)
@@ -209,6 +221,7 @@ class TestJedenCyklus(unittest.TestCase):
                     session=session, vinted_session=vinted_session,
                     notifier=notifier1, seen_ids_cesta=self.seen_path,
                     vinted_enabled=True,
+                    db_path=self.db_path,
                 )
 
         notifier2 = make_notifier_mock()
@@ -218,6 +231,7 @@ class TestJedenCyklus(unittest.TestCase):
                     session=session, vinted_session=vinted_session,
                     notifier=notifier2, seen_ids_cesta=self.seen_path,
                     vinted_enabled=True,
+                    db_path=self.db_path,
                 )
 
         notifier2.notifikuj_davku.assert_not_called()
@@ -233,6 +247,7 @@ class TestJedenCyklus(unittest.TestCase):
                     session=session, vinted_session=vinted_session,
                     notifier=notifier, seen_ids_cesta=self.seen_path,
                     vinted_enabled=True,
+                    db_path=self.db_path,
                 )
         self.assertIsInstance(seen, set)
 
@@ -315,8 +330,8 @@ class TestDbIntegraceVMain(unittest.TestCase):
         vinted_session = make_vinted_session()
 
         inzeraty = [
-            make_bazos_inzerat("555111", "Garmin Fenix 7 Sapphire Solar"),
-            make_vinted_inzerat("vt_777222"),
+            make_bazos_inzerat("555111", "PlayStation 5 Slim Disk"),
+            make_vinted_inzerat("vt_777222", "PS5 Digital Edition"),
         ]
 
         with patch("main.stahni_stranku", return_value=""):

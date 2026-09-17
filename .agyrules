@@ -1,7 +1,7 @@
-# Projekt: Bazoš Scraper - Minibagry (Autonomní Swarm)
+# Projekt: Bazoš & Vinted Scraper - PlayStation 5 Arbitráž (Autonomní Swarm)
 
 ## Kontext a Byznys plán
-Cílem je vytvořit 24/7 scraper na Bazoš (rubrika Stavební stroje, minibagry Kubota, JCB, atd.), který ihned po zveřejnění pošle notifikaci platícím klientům na Telegram. 
+Cílem je vytvořit 24/7 scraper na Bazoš a Vinted (konzole PlayStation 5: Disk, Digital, Slim), který ihned po zveřejnění pošle notifikaci na Telegram a ukládá inzeráty pro arbitrážní analýzu do SQLite databáze. 
 Aplikace se skládá z Python skriptu (scraper + filtrace) ve složce `/scraper` a Docker/Telegram nasazení ve složce `/deploy`.
 
 ## Pravidla pro autonomní vývoj (Role-playing)

@@ -1,11 +1,11 @@
-﻿# Dockerfile — Bazoš Scraper
+# Dockerfile — Bazoš Scraper
 # DevOps Agent | Slim Python image, non-root user, data persistence
 
 FROM python:3.12-slim
 
 # Metadata
-LABEL maintainer="Bazoš Scraper" \
-      description="24/7 minibagr scraper s Telegram notifikacemi"
+LABEL maintainer="Bazoš & Vinted Scraper" \
+      description="24/7 PS5 scraper s Telegram notifikacemi a arbitrážním dashboardem"
 
 # Systémové závislosti
 RUN apt-get update && apt-get install -y --no-install-recommends \

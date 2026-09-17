@@ -1,5 +1,5 @@
 """
-test_notifier.py — Unit testy pro notifier.py — Garmin chytré hodinky
+test_notifier.py — Unit testy pro notifier.py — PlayStation 5 konzole
 DevOps Agent | Vše mockováno — žádný skutečný Telegram request
 """
 
@@ -27,12 +27,12 @@ from notifier import (
 
 def inzerat(
     id: str = "100",
-    nazev: str = "Garmin Fenix 7 Sapphire",
-    url: str = "https://www.bazos.cz/inzerat/100/garmin-fenix-7.php",
+    nazev: str = "PlayStation 5 Disk Edition",
+    url: str = "https://pc.bazos.cz/inzerat/100/playstation-5.php",
     cena: str = "8 500 Kč",
     lokalita: str = "Praha",
     datum: str = "5.9. 2026",
-    popis: str = "Garmin Fenix 7 Sapphire Solar, zánovní, málo mth.",
+    popis: str = "PlayStation 5 s mechanikou 825GB, kompletní balení, zánovní stav.",
 ) -> Inzerat:
     return Inzerat(id=id, nazev=nazev, url=url, cena=cena,
                    lokalita=lokalita, datum=datum, popis=popis)
@@ -40,13 +40,13 @@ def inzerat(
 
 def vinted_inzerat(
     id: str = "vt_4567890001",
-    nazev: str = "Garmin Forerunner 945",
-    cena: str = "5 200 Kč",
+    nazev: str = "PS5 Slim Digital",
+    cena: str = "8 200 Kč",
 ) -> Inzerat:
     return Inzerat(
         id=id,
         nazev=nazev,
-        url=f"https://www.vinted.cz/items/{id[3:]}-garmin-forerunner",
+        url=f"https://www.vinted.cz/items/{id[3:]}-ps5-slim",
         cena=cena,
         lokalita="Brno",
         datum="VT",
@@ -82,9 +82,9 @@ def mock_session_err() -> MagicMock:
 class TestFormatujZpravu(unittest.TestCase):
 
     def test_obsahuje_nazev(self):
-        i = inzerat(nazev="Garmin Fenix 7 Sapphire")
+        i = inzerat(nazev="PlayStation 5 Disk Edition")
         zprava = formatuj_zpravu(i)
-        self.assertIn("Garmin Fenix 7 Sapphire", zprava)
+        self.assertIn("PlayStation 5 Disk Edition", zprava)
 
     def test_vinted_zdroj_ma_spravnou_hlavicku(self):
         """Inzerat z Vinted (vt_ prefix) musi mit Vinted hlavicku."""
@@ -94,11 +94,11 @@ class TestFormatujZpravu(unittest.TestCase):
         self.assertIn("🛍️", zprava)
 
     def test_bazos_zdroj_ma_spravnou_hlavicku(self):
-        """Inzerat z Bazose (bez vt_ prefixu) musi mit Bazos hlavicku s hodinkama."""
+        """Inzerat z Bazose (bez vt_ prefixu) musi mit Bazos hlavicku s gamepadem."""
         i = inzerat()
         zprava = formatuj_zpravu(i)
         self.assertIn("Bazoši", zprava)
-        self.assertIn("⌚", zprava)
+        self.assertIn("🎮", zprava)
 
     def test_obsahuje_url(self):
         i = inzerat()
@@ -258,13 +258,13 @@ class TestVytvorNotifierZEnv(unittest.TestCase):
         env = {
             "TELEGRAM_TOKEN": "123:abc",
             "TELEGRAM_CHAT_IDS": "111",
-            "HA_WEBHOOK_URL": "http://homeassistant.local:8123/api/webhook/garmin",
+            "HA_WEBHOOK_URL": "http://homeassistant.local:8123/api/webhook/ps5",
         }
         with patch.dict("os.environ", env, clear=True):
             notifier = vytvor_notifier_z_env()
         self.assertEqual(
             notifier.ha_webhook_url,
-            "http://homeassistant.local:8123/api/webhook/garmin",
+            "http://homeassistant.local:8123/api/webhook/ps5",
         )
 
     def test_ha_webhook_url_prazdna_kdyz_neni_v_env(self):
@@ -298,7 +298,7 @@ class TestHaWebhook(unittest.TestCase):
         response.raise_for_status = MagicMock()
         session.post.return_value = response
 
-        posli_ha_webhook(inzerat(), "http://ha.local/webhook/garmin", session)
+        posli_ha_webhook(inzerat(), "http://ha.local/webhook/ps5", session)
         session.post.assert_called_once()
 
     def test_webhook_pouziva_spravny_timeout(self):
@@ -308,7 +308,7 @@ class TestHaWebhook(unittest.TestCase):
         response.raise_for_status = MagicMock()
         session.post.return_value = response
 
-        posli_ha_webhook(inzerat(), "http://ha.local/webhook/garmin", session)
+        posli_ha_webhook(inzerat(), "http://ha.local/webhook/ps5", session)
         _, call_kwargs = session.post.call_args
         self.assertEqual(call_kwargs.get("timeout"), HA_WEBHOOK_TIMEOUT)
 
@@ -318,13 +318,13 @@ class TestHaWebhook(unittest.TestCase):
         response = MagicMock()
         response.raise_for_status = MagicMock()
         session.post.return_value = response
-        i = inzerat(id="123", nazev="Garmin Fenix 7")
+        i = inzerat(id="123", nazev="PlayStation 5 Disk")
 
-        posli_ha_webhook(i, "http://ha.local/webhook/garmin", session)
+        posli_ha_webhook(i, "http://ha.local/webhook/ps5", session)
         _, call_kwargs = session.post.call_args
         payload = call_kwargs.get("json")
         self.assertEqual(payload["id"], "123")
-        self.assertEqual(payload["nazev"], "Garmin Fenix 7")
+        self.assertEqual(payload["nazev"], "PlayStation 5 Disk")
         self.assertIn("cena", payload)
         self.assertIn("url", payload)
         self.assertIn("zdroj", payload)
@@ -352,7 +352,7 @@ class TestHaWebhook(unittest.TestCase):
         session.post.side_effect = req.RequestException("HA offline")
 
         # Nesmí vyhodit výjimku
-        posli_ha_webhook(inzerat(), "http://ha.local/webhook/garmin", session)
+        posli_ha_webhook(inzerat(), "http://ha.local/webhook/ps5", session)
 
     def test_http_error_je_pouze_warning(self):
         """HTTP chyba (napr. 404) nesmi probublat."""
@@ -362,7 +362,7 @@ class TestHaWebhook(unittest.TestCase):
         response.raise_for_status.side_effect = req.HTTPError("404")
         session.post.return_value = response
 
-        posli_ha_webhook(inzerat(), "http://ha.local/webhook/garmin", session)
+        posli_ha_webhook(inzerat(), "http://ha.local/webhook/ps5", session)
 
 
 # ---------------------------------------------------------------------------
@@ -376,7 +376,7 @@ class TestHaWebhookIntegrace(unittest.TestCase):
         session = mock_session_ok()
         notifier = TelegramNotifier(
             "token:test", ["111"], session,
-            ha_webhook_url="http://ha.local/webhook/garmin",
+            ha_webhook_url="http://ha.local/webhook/ps5",
         )
         with patch("notifier.posli_ha_webhook") as mock_ha:
             notifier.notifikuj_inzerat(inzerat())
@@ -395,7 +395,7 @@ class TestHaWebhookIntegrace(unittest.TestCase):
         session = mock_session_err()
         notifier = TelegramNotifier(
             "token:test", ["111"], session,
-            ha_webhook_url="http://ha.local/webhook/garmin",
+            ha_webhook_url="http://ha.local/webhook/ps5",
         )
         with patch("notifier.posli_ha_webhook") as mock_ha:
             notifier.notifikuj_inzerat(inzerat())
@@ -406,7 +406,7 @@ class TestHaWebhookIntegrace(unittest.TestCase):
         session = mock_session_ok()
         notifier = TelegramNotifier(
             "token:test", ["111", "222", "333"], session,
-            ha_webhook_url="http://ha.local/webhook/garmin",
+            ha_webhook_url="http://ha.local/webhook/ps5",
         )
         with patch("notifier.posli_ha_webhook") as mock_ha:
             notifier.notifikuj_inzerat(inzerat())

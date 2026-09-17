@@ -1,7 +1,7 @@
 """
 test_vinted_scraper.py — Unit testy pro vinted_scraper.py
 DevOps Agent | TDD smyčka — ŽÁDNÝ HTTP request na reálný Vinted.
-Testy čtou VÝHRADNĚ lokální HTML fixture: fixtures/vinted_garmin.html
+Testy čtou VÝHRADNĚ lokální HTML fixture: fixtures/vinted_ps5.html
 """
 
 import pathlib
@@ -20,7 +20,7 @@ from vinted_scraper import (
     SEARCH_URLS,
 )
 
-FIXTURE_PATH = pathlib.Path(__file__).parent / "fixtures" / "vinted_garmin.html"
+FIXTURE_PATH = pathlib.Path(__file__).parent / "fixtures" / "vinted_ps5.html"
 
 
 def nacti_fixture() -> str:
@@ -28,7 +28,7 @@ def nacti_fixture() -> str:
     if not FIXTURE_PATH.exists():
         raise FileNotFoundError(
             f"Fixture nenalezena: {FIXTURE_PATH}\n"
-            "Zkontroluj, zda soubor fixtures/vinted_garmin.html existuje."
+            "Zkontroluj, zda soubor fixtures/vinted_ps5.html existuje."
         )
     return FIXTURE_PATH.read_text(encoding="utf-8", errors="replace")
 
@@ -41,22 +41,22 @@ class TestExtrahujVintedId(unittest.TestCase):
     """Testy pro _extrahuj_vinted_id_z_url."""
 
     def test_standardni_url_relativni(self):
-        url = "/items/4567890001-garmin-fenix-7-sapphire"
+        url = "/items/4567890001-playstation-5-disk-edition"
         self.assertEqual(_extrahuj_vinted_id_z_url(url), "vt_4567890001")
 
     def test_absolutni_url(self):
-        url = "https://www.vinted.cz/items/987654321-garmin-forerunner"
+        url = "https://www.vinted.cz/items/987654321-ps5-digital"
         self.assertEqual(_extrahuj_vinted_id_z_url(url), "vt_987654321")
 
     def test_url_bez_items(self):
-        url = "https://www.vinted.cz/catalog?search_text=garmin"
+        url = "https://www.vinted.cz/catalog?search_text=ps5"
         self.assertEqual(_extrahuj_vinted_id_z_url(url), "")
 
     def test_prazdny_retezec(self):
         self.assertEqual(_extrahuj_vinted_id_z_url(""), "")
 
     def test_prefix_je_vt(self):
-        url = "/items/123456-garmin"
+        url = "/items/123456-ps5"
         vysledek = _extrahuj_vinted_id_z_url(url)
         self.assertTrue(vysledek.startswith(ID_PREFIX))
 
@@ -166,19 +166,19 @@ class TestParsujHtmlVinted(unittest.TestCase):
 
     # --- Konkrétní inzeráty ze fixture ---
 
-    def test_fenix_nalezen(self):
-        """Fixture obsahuje Fenix 7 — musí být naparsován."""
+    def test_ps5_disk_nalezen(self):
+        """Fixture obsahuje PS5 Disk — musí být naparsován."""
         nazvy = [i.nazev.lower() for i in self.inzeraty]
         self.assertTrue(
-            any("fenix" in n for n in nazvy),
-            "Inzerát Fenix 7 nebyl nalezen v parsovaných výsledcích."
+            any("disk" in n for n in nazvy),
+            "Inzerát PS5 Disk nebyl nalezen v parsovaných výsledcích."
         )
 
-    def test_forerunner_nalezen(self):
+    def test_ps5_slim_nalezen(self):
         nazvy = [i.nazev.lower() for i in self.inzeraty]
         self.assertTrue(
-            any("forerunner" in n for n in nazvy),
-            "Inzerát Forerunner nebyl nalezen."
+            any("slim" in n for n in nazvy),
+            "Inzerát PS5 Slim nebyl nalezen."
         )
 
     def test_cena_obsahuje_kc(self):
@@ -189,10 +189,10 @@ class TestParsujHtmlVinted(unittest.TestCase):
             "Žádný inzerát nemá cenu v Kč."
         )
 
-    def test_konkretni_id_fenix(self):
-        """Fixture ID 4567890001 (Fenix 7) musí být naparsován."""
+    def test_konkretni_id_ps5(self):
+        """Fixture ID 4567890001 (PS5 Disk) musí být naparsován."""
         ids = [i.id for i in self.inzeraty]
-        self.assertIn("vt_4567890001", ids, "ID vt_4567890001 (Fenix 7) nenalezeno.")
+        self.assertIn("vt_4567890001", ids, "ID vt_4567890001 (PS5 Disk) nenalezeno.")
 
 
 # ---------------------------------------------------------------------------
@@ -213,35 +213,35 @@ class TestParsujHtmlVintedPrazdny(unittest.TestCase):
     def test_html_s_jednim_inzeratem(self):
         html = """
         <html><body>
-          <a href="/items/999000001-garmin-test">
-            <img alt="Garmin Fenix Test" />
-            <span data-testid="description-title">Garmin Fenix Test</span>
-            <span data-testid="price-text">5 000 Kč</span>
+          <a href="/items/999000001-ps5-test">
+            <img alt="PlayStation 5 Test" />
+            <span data-testid="description-title">PlayStation 5 Test</span>
+            <span data-testid="price-text">8 500 Kč</span>
           </a>
         </body></html>
         """
         vysledky = parsuj_html_vinted(html)
         self.assertEqual(len(vysledky), 1)
         self.assertEqual(vysledky[0].id, "vt_999000001")
-        self.assertEqual(vysledky[0].nazev, "Garmin Fenix Test")
-        self.assertEqual(vysledky[0].cena, "5 000 Kč")
+        self.assertEqual(vysledky[0].nazev, "PlayStation 5 Test")
+        self.assertEqual(vysledky[0].cena, "8 500 Kč")
 
-    def test_inzerat_pouze_se_znackou_garmin(self):
+    def test_inzerat_pouze_se_znackou_sony(self):
         """Pokud prodejce vyplnil pouze Značku, scraper ji bezpečně použije jako název."""
         html = """
         <html><body>
           <div data-testid="grid-item">
             <a href="/items/888111001-item">
-              <span data-testid="description-title">Garmin</span>
-              <span data-testid="price-text">2 500 Kč</span>
+              <span data-testid="description-title">Sony</span>
+              <span data-testid="price-text">8 500 Kč</span>
             </a>
           </div>
         </body></html>
         """
         vysledky = parsuj_html_vinted(html)
         self.assertEqual(len(vysledky), 1)
-        self.assertEqual(vysledky[0].nazev, "Garmin")
-        self.assertEqual(vysledky[0].cena, "2 500 Kč")
+        self.assertEqual(vysledky[0].nazev, "Sony")
+        self.assertEqual(vysledky[0].cena, "8 500 Kč")
 
     def test_inzerat_se_znackou_v_item_brand(self):
         """Scraper detekuje Značku i z elementu item-brand a sloučí ji s modelem."""
@@ -249,33 +249,33 @@ class TestParsujHtmlVintedPrazdny(unittest.TestCase):
         <html><body>
           <div data-testid="grid-item">
             <a href="/items/888222002-item">
-              <span data-testid="item-brand">Garmin</span>
-              <span data-testid="description-subtitle">Instinct 2 Solar</span>
-              <span data-testid="price-text">4 800 Kč</span>
+              <span data-testid="item-brand">Sony</span>
+              <span data-testid="description-subtitle">PlayStation 5</span>
+              <span data-testid="price-text">9 200 Kč</span>
             </a>
           </div>
         </body></html>
         """
         vysledky = parsuj_html_vinted(html)
         self.assertEqual(len(vysledky), 1)
-        self.assertEqual(vysledky[0].nazev, "Garmin Instinct 2 Solar")
+        self.assertEqual(vysledky[0].nazev, "Sony PlayStation 5")
 
     def test_inzerat_s_oddelenou_znackou_a_modelem(self):
-        """Pokud description-title má Garmin a subtitle Forerunner 45, název je 'Garmin Forerunner 45'."""
+        """Pokud description-title má Sony a subtitle PS5 Slim, název je 'Sony PS5 Slim'."""
         html = """
         <html><body>
           <div data-testid="grid-item">
             <a href="/items/888333003-item">
-              <span data-testid="description-title">Garmin</span>
-              <span data-testid="description-subtitle">Forerunner 45</span>
-              <span data-testid="price-text">1 200 Kč</span>
+              <span data-testid="description-title">Sony</span>
+              <span data-testid="description-subtitle">PS5 Slim</span>
+              <span data-testid="price-text">8 900 Kč</span>
             </a>
           </div>
         </body></html>
         """
         vysledky = parsuj_html_vinted(html)
         self.assertEqual(len(vysledky), 1)
-        self.assertEqual(vysledky[0].nazev, "Garmin Forerunner 45")
+        self.assertEqual(vysledky[0].nazev, "Sony PS5 Slim")
 
 
 # ---------------------------------------------------------------------------
@@ -288,10 +288,10 @@ class TestVintedSearchUrl(unittest.TestCase):
     def test_search_url_je_plosna_bez_kategorie(self):
         self.assertEqual(
             SEARCH_URL,
-            "https://www.vinted.cz/catalog?search_text=garmin&order=newest_first",
+            "https://www.vinted.cz/catalog?search_text=ps5&order=newest_first",
         )
         self.assertNotIn("catalog[]", SEARCH_URL)
-        self.assertIn("search_text=garmin", SEARCH_URL)
+        self.assertIn("search_text=ps5", SEARCH_URL)
         self.assertIn("order=newest_first", SEARCH_URL)
 
     def test_search_urls_obsahuje_pouze_jedinou_plosnou_url(self):
@@ -307,9 +307,9 @@ class TestVintedKompozitniText(unittest.TestCase):
         html = """
         <div data-testid="feed-grid">
           <div data-testid="grid-item">
-            <a href="/items/9921837573-garmin-forerunner-570"
-               title="Garmin Forerunner 570, Značka: Garmin, Stav: Velmi dobrý, Velikost: 47 mm a více, 9299.00 Kč, 9781.95 Kč">
-              <img alt="Garmin Forerunner 570, Značka: Garmin, Stav: Velmi dobrý, Velikost: 47 mm a více, 9299.00 Kč, 9781.95 Kč" src="/img/fr570.jpg" />
+            <a href="/items/9921837573-sony-ps5-slim-1tb"
+               title="Sony PS5 Slim 1TB, Značka: Sony, Stav: Velmi dobrý, 9299.00 Kč, 9781.95 Kč">
+              <img alt="Sony PS5 Slim 1TB, Značka: Sony, Stav: Velmi dobrý, 9299.00 Kč, 9781.95 Kč" src="/img/ps5slim.jpg" />
             </a>
           </div>
         </div>
@@ -317,7 +317,7 @@ class TestVintedKompozitniText(unittest.TestCase):
         inzeraty = parsuj_html_vinted(html)
         self.assertEqual(len(inzeraty), 1)
         self.assertEqual(inzeraty[0].id, "vt_9921837573")
-        self.assertEqual(inzeraty[0].nazev, "Garmin Forerunner 570")
+        self.assertEqual(inzeraty[0].nazev, "Sony PS5 Slim 1TB")
         self.assertEqual(inzeraty[0].cena, "9299.00 Kč")
         self.assertIn("Stav: Velmi dobrý", inzeraty[0].popis or "")
 

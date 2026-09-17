@@ -1,5 +1,5 @@
 """
-test_db.py — Unit testy pro modul db.py (SQLite analytická platforma)
+test_db.py — Unit testy pro modul db.py (PS5 Arbitrage Platform)
 Python Agent | Role: TDD přístup, testy na in-memory databázi (:memory:)
 """
 
@@ -19,6 +19,7 @@ from db import (
     nacti_vsechny_inzeraty,
     oznac_jako_prodane,
     parsuj_cenu_na_int,
+    parsuj_ps5_inzerat,
     uloz_inzerat,
     uloz_inzeraty_davku,
     urci_portal,
@@ -48,7 +49,10 @@ class TestDbSchemaAInit(unittest.TestCase):
         self.assertEqual(row[0], "listings")
 
     def test_sloupce_tabulky_listings(self):
-        """Ověří přítomnost všech požadovaných sloupců v tabulce listings."""
+        """Ověří přítomnost všech požadovaných sloupců v tabulce listings.
+
+        Schéma PS5: edition (TEXT), is_slim (BOOLEAN) — parsed_model byl odstraněn.
+        """
         cursor = self.conn.cursor()
         cursor.execute("PRAGMA table_info(listings);")
         columns = {row[1]: row[2].upper() for row in cursor.fetchall()}
@@ -58,7 +62,9 @@ class TestDbSchemaAInit(unittest.TestCase):
             "item_id",
             "portal",
             "title",
-            "parsed_model",
+            "standardized_title",  # čistý název z LLM validace
+            "edition",    # nový sloupec pro PS5
+            "is_slim",    # nový sloupec pro PS5 Slim
             "price",
             "url",
             "found_date",
@@ -68,6 +74,10 @@ class TestDbSchemaAInit(unittest.TestCase):
 
         for col in ocekavane_sloupce:
             self.assertIn(col, columns, f"Sloupec '{col}' chybí v tabulce listings.")
+
+        # Ověříme, že parsed_model NENÍ v novém schématu
+        self.assertNotIn("parsed_model", columns,
+                         "Sloupec 'parsed_model' byl odstraněn v PS5 schématu.")
 
     def test_db_id_je_primary_key(self):
         """Ověří, že db_id je primární klíč."""
@@ -84,15 +94,70 @@ class TestDbSchemaAInit(unittest.TestCase):
         init_db(self.conn)
 
 
+class TestParsujPs5Inzerat(unittest.TestCase):
+    """Testy parsování edice (Disk/Digital/Unknown) a Slim varianty z názvu inzerátu."""
+
+    def test_digital_edition(self):
+        """Slova 'digital', 'digitální', 'bez mechaniky' → 'Digital'."""
+        self.assertEqual(parsuj_ps5_inzerat("PS5 Digital Edition")[0], "Digital")
+        self.assertEqual(parsuj_ps5_inzerat("PlayStation 5 Digitální verze")[0], "Digital")
+        self.assertEqual(parsuj_ps5_inzerat("PS5 bez mechaniky")[0], "Digital")
+        self.assertEqual(parsuj_ps5_inzerat("Sony PS5 No Disc")[0], "Digital")
+
+    def test_disk_edition(self):
+        """Slova 'disk', 'disc', 'mechanik', 'blu-ray' → 'Disk'."""
+        self.assertEqual(parsuj_ps5_inzerat("PS5 Disk Edition")[0], "Disk")
+        self.assertEqual(parsuj_ps5_inzerat("PlayStation 5 s mechanikou")[0], "Disk")
+        self.assertEqual(parsuj_ps5_inzerat("PS5 Blu-ray verze")[0], "Disk")
+        self.assertEqual(parsuj_ps5_inzerat("PS5 Disc Edition")[0], "Disk")
+
+    def test_unknown_edition(self):
+        """Bez klíčových slov → 'Unknown'."""
+        self.assertEqual(parsuj_ps5_inzerat("PS5 konzole")[0], "Unknown")
+        self.assertEqual(parsuj_ps5_inzerat("PlayStation 5")[0], "Unknown")
+        self.assertEqual(parsuj_ps5_inzerat("")[0], "Unknown")
+        self.assertEqual(parsuj_ps5_inzerat(None)[0], "Unknown")
+
+    def test_is_slim_true(self):
+        """Slovo 'slim' (case-insensitive) → is_slim = True."""
+        self.assertTrue(parsuj_ps5_inzerat("PS5 Slim Digital")[1])
+        self.assertTrue(parsuj_ps5_inzerat("PlayStation 5 SLIM")[1])
+        self.assertTrue(parsuj_ps5_inzerat("Sony PS5 slim edice")[1])
+
+    def test_is_slim_false(self):
+        """Bez 'slim' → is_slim = False."""
+        self.assertFalse(parsuj_ps5_inzerat("PS5 Digital Edition")[1])
+        self.assertFalse(parsuj_ps5_inzerat("PlayStation 5 Disk")[1])
+        self.assertFalse(parsuj_ps5_inzerat("")[1])
+
+    def test_slim_digital_kombinace(self):
+        """Kombinace Slim + Digital vrátí ('Digital', True)."""
+        edition, is_slim = parsuj_ps5_inzerat("PS5 Slim Digital Edition")
+        self.assertEqual(edition, "Digital")
+        self.assertTrue(is_slim)
+
+    def test_slim_disk_kombinace(self):
+        """Kombinace Slim + Disk vrátí ('Disk', True)."""
+        edition, is_slim = parsuj_ps5_inzerat("PS5 Slim Disk Edition")
+        self.assertEqual(edition, "Disk")
+        self.assertTrue(is_slim)
+
+    def test_case_insensitive(self):
+        """Parsování je case-insensitive."""
+        self.assertEqual(parsuj_ps5_inzerat("PS5 DIGITAL")[0], "Digital")
+        self.assertEqual(parsuj_ps5_inzerat("PS5 DISK")[0], "Disk")
+        self.assertTrue(parsuj_ps5_inzerat("PS5 SLIM")[1])
+
+
 class TestPomocneFunkce(unittest.TestCase):
     """Testy pomocných funkcí určení portálu a parsování ceny."""
 
     def test_urci_portal_bazos(self):
         inzerat = Inzerat(
             id="123456",
-            nazev="Garmin Fenix 7",
-            url="https://www.bazos.cz/inzerat/123456/garmin.php",
-            cena="8 000 Kč",
+            nazev="PlayStation 5 Slim Digital",
+            url="https://www.bazos.cz/inzerat/123456/ps5.php",
+            cena="12 000 Kč",
             lokalita="Praha",
             datum="6.9. 2026",
         )
@@ -101,9 +166,9 @@ class TestPomocneFunkce(unittest.TestCase):
     def test_urci_portal_vinted(self):
         inzerat = Inzerat(
             id="vt_987654",
-            nazev="Garmin Forerunner 945",
-            url="https://www.vinted.cz/items/987654-garmin",
-            cena="5 000 Kč",
+            nazev="PS5 Slim Disk",
+            url="https://www.vinted.cz/items/987654-ps5",
+            cena="11 500 Kč",
             lokalita="Brno",
             datum="VT",
         )
@@ -136,7 +201,7 @@ class TestPomocneFunkce(unittest.TestCase):
 
 
 class TestUlozInzerat(unittest.TestCase):
-    """Testy ukládání inzerátů a deduplikace dle item_id."""
+    """Testy ukládání inzerátů PS5 a deduplikace dle item_id."""
 
     def setUp(self):
         self.conn = ziskej_pripojeni(":memory:")
@@ -145,16 +210,16 @@ class TestUlozInzerat(unittest.TestCase):
     def tearDown(self):
         self.conn.close()
 
-    def test_uloz_novy_inzerat_uspech(self):
-        """Ověří vložení nového inzerátu a jeho hodnot v DB."""
+    def test_uloz_novy_inzerat_disk_edition(self):
+        """Ověří vložení nového PS5 Disk inzerátu a automatické detekování edition."""
         inzerat = Inzerat(
             id="101010",
-            nazev="Garmin Fenix 7 Pro Sapphire",
-            url="https://www.bazos.cz/inzerat/101010/garmin-fenix.php",
-            cena="11 500 Kč",
+            nazev="PlayStation 5 Disk Edition",
+            url="https://www.bazos.cz/inzerat/101010/ps5-disk.php",
+            cena="13 500 Kč",
             lokalita="Plzeň",
             datum="6.9. 2026",
-            popis="Krásné hodinky v záruce.",
+            popis="Krásná konzole, záruční list v pořádku.",
         )
 
         ted = datetime.datetime(2026, 9, 6, 15, 30, 0)
@@ -163,7 +228,6 @@ class TestUlozInzerat(unittest.TestCase):
             db_conn=self.conn,
             status="active",
             found_date=ted,
-            parsed_model="Fenix 7 Pro",
         )
 
         self.assertTrue(vysledek, "uloz_inzerat měl vrátit True pro nový záznam.")
@@ -172,21 +236,74 @@ class TestUlozInzerat(unittest.TestCase):
         self.assertIsNotNone(zaznam)
         self.assertEqual(zaznam["item_id"], "101010")
         self.assertEqual(zaznam["portal"], "bazos")
-        self.assertEqual(zaznam["title"], "Garmin Fenix 7 Pro Sapphire")
-        self.assertEqual(zaznam["parsed_model"], "Fenix 7 Pro")
-        self.assertEqual(zaznam["price"], 11500)
-        self.assertEqual(zaznam["url"], "https://www.bazos.cz/inzerat/101010/garmin-fenix.php")
+        self.assertEqual(zaznam["title"], "PlayStation 5 Disk Edition")
+        self.assertEqual(zaznam["edition"], "Disk")
+        self.assertEqual(zaznam["is_slim"], 0)
+        self.assertEqual(zaznam["price"], 13500)
+        self.assertEqual(zaznam["url"], "https://www.bazos.cz/inzerat/101010/ps5-disk.php")
         self.assertEqual(zaznam["found_date"], "2026-09-06 15:30:00")
         self.assertIsNone(zaznam["sold_date"])
         self.assertEqual(zaznam["status"], "active")
+
+    def test_uloz_novy_inzerat_digital_slim(self):
+        """Ověří automatickou detekci 'Digital' edice a Slim varianty."""
+        inzerat = Inzerat(
+            id="202022",
+            nazev="PS5 Slim Digital Edition Sony",
+            url="https://www.bazos.cz/inzerat/202022/ps5-slim.php",
+            cena="11 900 Kč",
+            lokalita="Praha",
+            datum="6.9. 2026",
+        )
+
+        uloz_inzerat(inzerat, db_conn=self.conn)
+
+        zaznam = nacti_inzerat_dle_item_id("202022", db_conn=self.conn)
+        self.assertIsNotNone(zaznam)
+        self.assertEqual(zaznam["edition"], "Digital")
+        self.assertEqual(zaznam["is_slim"], 1)
+
+    def test_uloz_novy_inzerat_unknown_edition(self):
+        """Bez klíčových slov = Unknown edice."""
+        inzerat = Inzerat(
+            id="303033",
+            nazev="PS5 konzole super stav",
+            url="https://www.bazos.cz/inzerat/303033/ps5.php",
+            cena="12 000 Kč",
+            lokalita="Brno",
+            datum="6.9. 2026",
+        )
+
+        uloz_inzerat(inzerat, db_conn=self.conn)
+
+        zaznam = nacti_inzerat_dle_item_id("303033", db_conn=self.conn)
+        self.assertEqual(zaznam["edition"], "Unknown")
+        self.assertEqual(zaznam["is_slim"], 0)
+
+    def test_uloz_inzerat_s_explicitnim_edition(self):
+        """Lze předat edition a is_slim explicitně (přepíše automatickou detekci)."""
+        inzerat = Inzerat(
+            id="404044",
+            nazev="PS5 konzole",  # název bez klíčových slov
+            url="https://www.bazos.cz/inzerat/404044/ps5.php",
+            cena="10 000 Kč",
+            lokalita="Ostrava",
+            datum="6.9. 2026",
+        )
+
+        uloz_inzerat(inzerat, db_conn=self.conn, edition="Disk", is_slim=True)
+
+        zaznam = nacti_inzerat_dle_item_id("404044", db_conn=self.conn)
+        self.assertEqual(zaznam["edition"], "Disk")
+        self.assertEqual(zaznam["is_slim"], 1)
 
     def test_duplicitni_item_id_je_ignorovano(self):
         """Ověří, že duplicitní item_id nevyvolá chybu a vrátí False (ignorováno)."""
         inzerat = Inzerat(
             id="202020",
-            nazev="Garmin Epix Gen 2",
-            url="https://www.bazos.cz/inzerat/202020/epix.php",
-            cena="10 000 Kč",
+            nazev="PS5 Disk Edition",
+            url="https://www.bazos.cz/inzerat/202020/ps5.php",
+            cena="13 000 Kč",
             lokalita="Ostrava",
             datum="6.9. 2026",
         )
@@ -206,9 +323,9 @@ class TestUlozInzerat(unittest.TestCase):
         """Bez explicitního data se nastaví aktuální datum a status 'active'."""
         inzerat = Inzerat(
             id="vt_303030",
-            nazev="Garmin Instinct 2 Solar",
-            url="https://www.vinted.cz/items/303030-garmin-instinct",
-            cena="4 500 Kč",
+            nazev="PS5 Slim Digital",
+            url="https://www.vinted.cz/items/303030-ps5",
+            cena="11 500 Kč",
             lokalita="Liberec",
             datum="VT",
         )
@@ -227,17 +344,17 @@ class TestUlozInzerat(unittest.TestCase):
         inzeraty = [
             Inzerat(
                 id="404041",
-                nazev="Garmin Venu 3",
-                url="https://www.bazos.cz/inzerat/404041/venu.php",
-                cena="6 500 Kč",
+                nazev="PS5 Disk Edition",
+                url="https://www.bazos.cz/inzerat/404041/ps5.php",
+                cena="13 500 Kč",
                 lokalita="Brno",
                 datum="6.9. 2026",
             ),
             Inzerat(
                 id="404042",
-                nazev="Garmin Fenix 6 Pro",
-                url="https://www.bazos.cz/inzerat/404042/fenix6.php",
-                cena="5 500 Kč",
+                nazev="PS5 Slim Digital Edition",
+                url="https://www.bazos.cz/inzerat/404042/ps5slim.php",
+                cena="11 900 Kč",
                 lokalita="Praha",
                 datum="6.9. 2026",
             ),
@@ -251,9 +368,9 @@ class TestUlozInzerat(unittest.TestCase):
             inzeraty[0],  # již existuje
             Inzerat(
                 id="404043",
-                nazev="Garmin Tactix 7",
-                url="https://www.bazos.cz/inzerat/404043/tactix.php",
-                cena="15 000 Kč",
+                nazev="PS5 konzole bez mechaniky",
+                url="https://www.bazos.cz/inzerat/404043/ps5digital.php",
+                cena="10 000 Kč",
                 lokalita="Pardubice",
                 datum="6.9. 2026",
             ),
@@ -263,6 +380,17 @@ class TestUlozInzerat(unittest.TestCase):
 
         vsechny = nacti_vsechny_inzeraty(db_conn=self.conn)
         self.assertEqual(len(vsechny), 3)
+
+        # Ověř, že davka správně detekovala edice
+        zaznam_disk = nacti_inzerat_dle_item_id("404041", db_conn=self.conn)
+        self.assertEqual(zaznam_disk["edition"], "Disk")
+
+        zaznam_slim = nacti_inzerat_dle_item_id("404042", db_conn=self.conn)
+        self.assertEqual(zaznam_slim["edition"], "Digital")
+        self.assertEqual(zaznam_slim["is_slim"], 1)
+
+        zaznam_digital = nacti_inzerat_dle_item_id("404043", db_conn=self.conn)
+        self.assertEqual(zaznam_digital["edition"], "Digital")
 
 
 class TestAktivniAProdaneInzeraty(unittest.TestCase):
@@ -282,9 +410,9 @@ class TestAktivniAProdaneInzeraty(unittest.TestCase):
 
     def test_nacti_aktivni_inzeraty_vraci_pouze_status_active(self):
         """Ověří, že funkce filtruje pouze inzeráty se statusem 'active'."""
-        inz1 = Inzerat("111", "Garmin 1", "https://bazos.cz/111", "5000 Kč", "Praha", "6.9.")
-        inz2 = Inzerat("222", "Garmin 2", "https://bazos.cz/222", "6000 Kč", "Brno", "6.9.")
-        inz3 = Inzerat("333", "Garmin 3", "https://bazos.cz/333", "7000 Kč", "Plzeň", "6.9.")
+        inz1 = Inzerat("111", "PS5 Disk", "https://bazos.cz/111", "13000 Kč", "Praha", "6.9.")
+        inz2 = Inzerat("222", "PS5 Digital", "https://bazos.cz/222", "11500 Kč", "Brno", "6.9.")
+        inz3 = Inzerat("333", "PS5 Slim", "https://bazos.cz/333", "12000 Kč", "Plzeň", "6.9.")
 
         uloz_inzerat(inz1, db_conn=self.conn, status="active")
         uloz_inzerat(inz2, db_conn=self.conn, status="sold")
@@ -297,7 +425,7 @@ class TestAktivniAProdaneInzeraty(unittest.TestCase):
 
     def test_oznac_jako_prodane_s_explicitnim_datem(self):
         """Ověří změnu statusu na 'sold' a uložení zadaného data prodeje."""
-        inz = Inzerat("555", "Garmin Fenix 7", "https://bazos.cz/555", "8000 Kč", "Praha", "6.9.")
+        inz = Inzerat("555", "PS5 Disk Edition", "https://bazos.cz/555", "13500 Kč", "Praha", "6.9.")
         uloz_inzerat(inz, db_conn=self.conn, status="active")
 
         zaznam = nacti_inzerat_dle_item_id("555", db_conn=self.conn)
@@ -313,7 +441,7 @@ class TestAktivniAProdaneInzeraty(unittest.TestCase):
 
     def test_oznac_jako_prodane_s_vychozim_datem(self):
         """Pokud sold_date není zadáno, doplní se aktuální datum a čas."""
-        inz = Inzerat("777", "Garmin Epix", "https://bazos.cz/777", "9000 Kč", "Brno", "6.9.")
+        inz = Inzerat("777", "PS5 Digital", "https://bazos.cz/777", "11000 Kč", "Brno", "6.9.")
         uloz_inzerat(inz, db_conn=self.conn, status="active")
 
         zaznam = nacti_inzerat_dle_item_id("777", db_conn=self.conn)

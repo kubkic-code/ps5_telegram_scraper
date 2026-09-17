@@ -1,5 +1,5 @@
 """
-scraper.py — Bazoš Scraper — Chytré hodinky / Garmin
+scraper.py — Bazoš Scraper — PlayStation 5 konzole
 Python Agent | Role: čistý kód, lokální HTML, randomizované prodlevy
 """
 
@@ -21,10 +21,10 @@ from bs4 import BeautifulSoup
 # Konfigurace
 # ---------------------------------------------------------------------------
 
-# Kategorie 693 = Chytré hodinky / Sport hodinky na Bazoši
+# Bazoš.cz vyhledávání konzolí PlayStation 5
 BASE_URL = "https://www.bazos.cz/search.php"
 DEFAULT_PARAMS = {
-    "hledat": "garmin",
+    "hledat": "ps5",
     "rubriky": "0",
     "hlokalita": "0",
     "humkreis": "25",
@@ -41,7 +41,7 @@ HEADERS = {
         "Chrome/124.0.0.0 Safari/537.36"
     ),
     "Accept-Language": "cs-CZ,cs;q=0.9",
-    "Referer": "https://www.bazos.cz/search.php?hledat=garmin",
+    "Referer": "https://www.bazos.cz/search.php?hledat=ps5",
 }
 
 # Prodleva mezi dotazy (sekundy) — randomizovaná, aby nás nezabanovali
@@ -78,7 +78,7 @@ def _extrahuj_id_z_url(url: str) -> str:
     """Vytáhne numerické ID inzerátu z URL.
 
     Příklad:
-        https://stroje.bazos.cz/inzerat/223396379/minibagr-saurus.php -> '223396379'
+        https://pc.bazos.cz/inzerat/223396379/playstation-5.php -> '223396379'
     """
     match = re.search(r"/inzerat/(\d+)/", url)
     return match.group(1) if match else ""
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
     session = vytvor_session()
-    logger.info("Stahuji stránku z Bazoše (Garmin hodinky)…")
+    logger.info("Stahuji stránku z Bazoše (PlayStation 5)…")
     html = stahni_stranku(session, pauza=False)
     inzeraty = parsuj_html(html)
 

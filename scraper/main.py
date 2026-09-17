@@ -1,5 +1,5 @@
 """
-main.py — Hlavní smyčka Multi-Portál Scraperu — Garmin chytré hodinky
+main.py — Hlavní smyčka Multi-Portál Scraperu — PlayStation 5 konzole
 Python Agent | Bazoš.cz + Vinted.cz | 24/7 | graceful shutdown
 
 Spuštění:
@@ -86,8 +86,8 @@ def jeden_cyklus(
     """Provede jeden kompletní scrape cyklus pro VSECHNY portaly.
 
     Portaly:
-        1. Bazos.cz  — cesky trh (search: garmin)
-        2. Vinted.cz — bazar hodinky (pokud vinted_enabled=True)
+        1. Bazos.cz  — cesky trh (search: ps5 / playstation 5)
+        2. Vinted.cz — bazar konzole (pokud vinted_enabled=True)
 
     Pipeline:
         1. Stahne HTML z obou portalu
@@ -156,7 +156,7 @@ def jeden_cyklus(
 
 def spust():
     """Spusti hlavni smycku multi-portal scraperu."""
-    logger.info("=== Garmin Watch Scraper START ===")
+    logger.info("=== PS5 Arbitrage Scraper START ===")
     logger.info(
         "Portaly: Bazos.cz%s | Interval: %d-%d s | seen_ids: %s | DB: %s",
         " + Vinted.cz" if VINTED_ENABLED else " (Vinted vypnut)",
@@ -223,7 +223,7 @@ def spust():
                 break
             time.sleep(1)
 
-    logger.info("=== Garmin Watch Scraper STOP ===")
+    logger.info("=== PS5 Arbitrage Scraper STOP ===")
 
 
 if __name__ == "__main__":

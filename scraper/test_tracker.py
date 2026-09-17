@@ -46,7 +46,7 @@ class TestVyhodnotStavInzeratu(unittest.TestCase):
         self.assertTrue(vyhodnot_stav_inzeratu("bazos", 200, text))
 
     def test_bazos_aktivni_inzerat_neni_prodan(self):
-        text = "<html><body><h1>Garmin Fenix 7</h1><p>Prodám zánovní hodinky.</p></body></html>"
+        text = "<html><body><h1>PlayStation 5</h1><p>Prodám zánovní konzoli.</p></body></html>"
         self.assertFalse(vyhodnot_stav_inzeratu("bazos", 200, text))
 
     # --- Vinted ---
@@ -65,7 +65,7 @@ class TestVyhodnotStavInzeratu(unittest.TestCase):
         )
 
     def test_vinted_aktivni_inzerat_neni_prodan(self):
-        text = "<html><body><h1>Garmin Forerunner 945</h1></body></html>"
+        text = "<html><body><h1>PS5 Slim Digital</h1></body></html>"
         self.assertFalse(
             vyhodnot_stav_inzeratu("vinted", 200, text, is_redirect=False, history=[])
         )
@@ -77,7 +77,7 @@ class TestZkontrolujInzerat(unittest.TestCase):
     def test_aktivni_inzerat_vraci_false(self):
         mock_resp = MagicMock()
         mock_resp.status_code = 200
-        mock_resp.text = "Garmin Instinct 2 Solar v top stavu"
+        mock_resp.text = "Sony PS5 konzole v top stavu"
         mock_resp.history = []
 
         mock_session = MagicMock()
@@ -86,7 +86,7 @@ class TestZkontrolujInzerat(unittest.TestCase):
         inzerat = {
             "db_id": 1,
             "portal": "bazos",
-            "url": "https://www.bazos.cz/inzerat/1/garmin.php",
+            "url": "https://pc.bazos.cz/inzerat/1/ps5.php",
         }
 
         vysledek = zkontroluj_inzerat(inzerat, session=mock_session, pauza=False)
@@ -104,7 +104,7 @@ class TestZkontrolujInzerat(unittest.TestCase):
         inzerat = {
             "db_id": 2,
             "portal": "bazos",
-            "url": "https://www.bazos.cz/inzerat/2/garmin.php",
+            "url": "https://pc.bazos.cz/inzerat/2/ps5.php",
         }
 
         vysledek = zkontroluj_inzerat(inzerat, session=mock_session, pauza=False)
@@ -122,7 +122,7 @@ class TestZkontrolujInzerat(unittest.TestCase):
         inzerat = {
             "db_id": 3,
             "portal": "vinted",
-            "url": "https://www.vinted.cz/items/3-garmin",
+            "url": "https://www.vinted.cz/items/3-ps5",
         }
 
         vysledek = zkontroluj_inzerat(inzerat, session=mock_session, pauza=False)
@@ -135,7 +135,7 @@ class TestZkontrolujInzerat(unittest.TestCase):
         inzerat = {
             "db_id": 4,
             "portal": "bazos",
-            "url": "https://www.bazos.cz/inzerat/4/garmin.php",
+            "url": "https://pc.bazos.cz/inzerat/4/ps5.php",
         }
 
         # Při výpadku sítě nesmíme chybně označit inzerát jako prodaný
@@ -156,19 +156,19 @@ class TestZkontrolujInzeratyDavka(unittest.TestCase):
     def test_zkontroluj_inzeraty_aktualizuje_db(self):
         # 1: Aktivní Bazoš (zůstane active)
         uloz_inzerat(
-            Inzerat("101", "Garmin Fenix 7", "https://bazos.cz/101", "8000 Kč", "Praha", "6.9."),
+            Inzerat("101", "PlayStation 5 Disk Edition", "https://pc.bazos.cz/101", "8000 Kč", "Praha", "6.9."),
             db_conn=self.conn,
             status="active",
         )
         # 2: Smazaný Bazoš (stane se sold)
         uloz_inzerat(
-            Inzerat("102", "Garmin Epix", "https://bazos.cz/102", "10000 Kč", "Brno", "6.9."),
+            Inzerat("102", "PS5 Slim Digital", "https://pc.bazos.cz/102", "10000 Kč", "Brno", "6.9."),
             db_conn=self.conn,
             status="active",
         )
         # 3: Přesměrovaný Vinted (stane se sold)
         uloz_inzerat(
-            Inzerat("vt_103", "Garmin Forerunner", "https://vinted.cz/items/103", "5000 Kč", "Ostrava", "VT"),
+            Inzerat("vt_103", "Sony PlayStation 5", "https://vinted.cz/items/103", "5000 Kč", "Ostrava", "VT"),
             db_conn=self.conn,
             status="active",
         )

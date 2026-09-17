@@ -1,9 +1,9 @@
 """
-vinted_scraper.py — Vinted.cz Scraper (Garmin chytré hodinky)
+vinted_scraper.py — Vinted.cz Scraper (PlayStation 5 konzole)
 Python Agent | Samostatný modul, výstup sjednocen do formátu Inzerat
 
-Portál: https://www.vinted.cz/catalog?search_text=garmin&catalog[]=2375
-Kategorie: Hodinky → Smart hodinky
+Portál: https://www.vinted.cz/catalog?search_text=ps5&order=newest_first
+Kategorie: Herní konzole → PlayStation 5
 
 Anti-bot strategie — curl_cffi místo requests:
 - curl_cffi.requests s impersonate='chrome' emuluje TLS fingerprint Chrome
@@ -38,9 +38,9 @@ logger = logging.getLogger(__name__)
 BASE_URL = "https://www.vinted.cz"
 
 # Vinted search URL — plošné prohledávání bez omezení na kategorii
-SEARCH_URL = "https://www.vinted.cz/catalog?search_text=garmin&order=newest_first"
+SEARCH_URL = "https://www.vinted.cz/catalog?search_text=ps5&order=newest_first"
 
-# Jediná plošná URL pro stažení všech Garmin inzerátů na Vintedu
+# Plošná URL pro stažení PS5 inzerátů na Vintedu
 SEARCH_URLS: list[str] = [
     SEARCH_URL,
 ]
@@ -88,8 +88,8 @@ def _extrahuj_vinted_id_z_url(url: str) -> str:
     """Vytáhne ID inzerátu z Vinted URL.
 
     Příklady:
-        /items/123456789-garmin-fenix-7  →  'vt_123456789'
-        https://www.vinted.cz/items/987654321-garmin  →  'vt_987654321'
+        /items/123456789-ps5-digital  →  'vt_123456789'
+        https://www.vinted.cz/items/987654321-playstation-5  →  'vt_987654321'
     """
     match = re.search(r"/items/(\d+)", url)
     return f"{ID_PREFIX}{match.group(1)}" if match else ""
@@ -164,7 +164,7 @@ def parsuj_html_vinted(html: str) -> list[Inzerat]:
 
         # --- Značka a Název ---
         # Na Vintedu bývá:
-        # - data-testid="description-title" (často Značka prodejce, např. 'Garmin')
+        # - data-testid="description-title" (často Značka prodejce, např. 'Sony' nebo 'PlayStation')
         # - data-testid="description-subtitle" (často doplňující název, model, velikost)
         # - data-testid="item-brand" nebo třída 'brand' (explicitní značka)
         title_el = card.find(attrs={"data-testid": "description-title"})
@@ -184,14 +184,14 @@ def parsuj_html_vinted(html: str) -> list[Inzerat]:
         znacka = ""
         if brand_text:
             znacka = brand_text
-        elif title_text and "garmin" in title_text.lower():
+        elif title_text and any(k in title_text.lower() for k in ("sony", "playstation", "ps5")):
             znacka = title_text
-        elif subtitle_text and "garmin" in subtitle_text.lower():
+        elif subtitle_text and any(k in subtitle_text.lower() for k in ("sony", "playstation", "ps5")):
             znacka = subtitle_text
-        elif "garmin" in img_alt.lower():
-            znacka = "Garmin"
-        elif "garmin" in url.lower():
-            znacka = "Garmin"
+        elif any(k in img_alt.lower() for k in ("sony", "playstation", "ps5")):
+            znacka = "PlayStation"
+        elif any(k in url.lower() for k in ("sony", "playstation", "ps5")):
+            znacka = "PlayStation"
 
         # Sestavení názvu inzerátu
         nazev = ""
@@ -228,10 +228,11 @@ def parsuj_html_vinted(html: str) -> list[Inzerat]:
                     if len(slug_nazev) >= 3:
                         nazev = slug_nazev.title()
 
-        # Pokud máme explicitní značku (např. 'Garmin') a v sestaveném názvu dosud není,
-        # připojíme ji pro jednoznačnost (např. značka='Garmin', název='Forerunner 55' -> 'Garmin Forerunner 55')
+        # Pokud máme explicitní značku (např. 'Sony') a v sestaveném názvu dosud není,
+        # připojíme ji pro jednoznačnost
         if znacka and znacka.lower() not in nazev.lower():
-            nazev = f"{znacka} {nazev}".strip()
+            if brand_text or not any(k in nazev.lower() for k in ("ps5", "playstation", "sony")):
+                nazev = f"{znacka} {nazev}".strip()
 
         if not nazev or len(nazev) < 3:
             logger.debug("[Vinted] Přeskakuji inzerát bez názvu (id=%s)", inzerat_id)

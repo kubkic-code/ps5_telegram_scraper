@@ -1,5 +1,5 @@
 """
-notifier.py — Telegram notifikace — Garmin chytré hodinky
+notifier.py — Telegram notifikace — PlayStation 5 konzole
 Python Agent | Odesílá nové inzeráty platcím klientům přes Telegram Bot API
 """
 
@@ -73,7 +73,7 @@ def formatuj_zpravu(inzerat: Inzerat) -> str:
     if inzerat.id.startswith("vt_"):
         zdroj = "🛍️ *Nový inzerát na Vinted\\.cz\\!*"
     else:
-        zdroj = "⌚ *Nový inzerát na Bazoši\\!*"
+        zdroj = "🎮 *Nový inzerát na Bazoši\\!*"
 
     zprava = (
         f"{zdroj}\n\n"

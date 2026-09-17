@@ -1,4 +1,4 @@
-﻿"""
+"""
 test_scraper.py — Unit testy pro scraper.py (Fáze 1)
 DevOps Agent | TDD smyčka — ŽÁDNÝ HTTP request na reálný Bazoš.
 Testy čtou VÝHRADNĚ lokální HTML fixture: fixtures/bazos_search.html
@@ -30,7 +30,7 @@ class TestExtrahujId(unittest.TestCase):
     """Testy pro pomocnou funkci _extrahuj_id_z_url."""
 
     def test_standardni_url(self):
-        url = "https://stroje.bazos.cz/inzerat/223396379/minibagr-saurus-10n-diesel.php"
+        url = "https://pc.bazos.cz/inzerat/223396379/playstation-5-slim.php"
         self.assertEqual(_extrahuj_id_z_url(url), "223396379")
 
     def test_kratka_url(self):
@@ -38,7 +38,7 @@ class TestExtrahujId(unittest.TestCase):
         self.assertEqual(_extrahuj_id_z_url(url), "111222333")
 
     def test_url_bez_id(self):
-        url = "https://www.bazos.cz/search.php?hledat=minibagr"
+        url = "https://www.bazos.cz/search.php?hledat=ps5"
         self.assertEqual(_extrahuj_id_z_url(url), "")
 
     def test_prazdny_retezec(self):
@@ -139,7 +139,7 @@ class TestParsujHtml(unittest.TestCase):
     def test_prvni_inzerat_id(self):
         """Fixture obsahuje inzerát 223396379 jako první výsledek."""
         ids = [i.id for i in self.inzeraty]
-        self.assertIn("223396379", ids, "Inzerát 223396379 (Saurus 10N) nebyl nalezen.")
+        self.assertIn("223396379", ids, "Inzerát 223396379 (PlayStation 5 Slim) nebyl nalezen.")
 
     def test_cena_obsahuje_kc_nebo_v_textu(self):
         """Cena musí obsahovat 'Kč' nebo být 'V textu'."""

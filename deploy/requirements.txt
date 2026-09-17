@@ -3,7 +3,7 @@
 
 beautifulsoup4==4.12.3
 requests==2.32.3
-# curl_cffi — TLS impersonace Chrome pro Kleinanzeigen (obejití anti-bot ochrany)
+# curl_cffi — TLS impersonace Chrome pro Vinted (obejití anti-bot ochrany)
 curl-cffi==0.7.3
 # lxml jako rychlý HTML parser (fallback: html.parser)
 lxml==5.2.2
@@ -11,3 +11,5 @@ lxml==5.2.2
 streamlit==1.36.0
 pandas==2.2.2
 plotly==5.22.0
+# LLM validace inzerátů — nová oficiální knihovna Google (google-generativeai je deprecated)
+google-genai==2.23.0
